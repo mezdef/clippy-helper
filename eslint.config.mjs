@@ -29,6 +29,8 @@ const eslintConfig = [
       'key-spacing': 'off',
       // Disallow explicit any
       '@typescript-eslint/no-explicit-any': 'error',
+      // Require explicit return types on module boundaries
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
     },
   },
 ];

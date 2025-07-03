@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import React from "react";
+import React, { JSX } from "react";
 import { Form } from "../components/Form";
 import { Input } from "../components/Input";
 
 type FormData = { textInput: string };
 
-export default function Home() {
+export default function Home(): JSX.Element {
   const methods = useForm<FormData>();
   const [submitted, setSubmitted] = React.useState("");
   const onSubmit = (data: FormData) => {
