@@ -13,7 +13,7 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   ...compat.extends('prettier'), // Disable ESLint rules that conflict with Prettier
   {
-    plugins: ['prettier'],
+    plugins: ['prettier', '@typescript-eslint'],
     rules: {
       // Prettier integration
       'prettier/prettier': 'error',
@@ -27,6 +27,8 @@ const eslintConfig = [
       'array-bracket-spacing': 'off',
       'comma-spacing': 'off',
       'key-spacing': 'off',
+      // Disallow explicit any
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
 ];
