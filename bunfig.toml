@@ -1,0 +1,13 @@
+[install]
+# Use exact versions for better reproducibility
+exact = false
+
+[install.scopes]
+# Configure any scoped packages if needed
+
+[test]
+# Configure test settings if needed
+
+[run]
+# Configure run settings
+bun = true 
