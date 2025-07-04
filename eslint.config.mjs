@@ -17,12 +17,12 @@ const eslintConfig = [
     rules: {
       // Prettier integration
       'prettier/prettier': 'error',
-      
+
       // Disable formatting rules that Prettier handles
-      'indent': 'off',
+      indent: 'off',
       'comma-dangle': 'off',
-      'semi': 'off',
-      'quotes': 'off',
+      semi: ['error', 'always'],
+      quotes: 'off',
       'object-curly-spacing': 'off',
       'array-bracket-spacing': 'off',
       'comma-spacing': 'off',
@@ -31,6 +31,8 @@ const eslintConfig = [
       '@typescript-eslint/no-explicit-any': 'error',
       // Require explicit return types on module boundaries
       '@typescript-eslint/explicit-module-boundary-types': 'error',
+      // Disallow unused exports
+      'no-unused-exports': 'error',
     },
   },
 ];
