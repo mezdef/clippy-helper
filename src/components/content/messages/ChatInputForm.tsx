@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { MessageType, useMessagesContext } from './MessagesContext';
 import { Form, Input } from '@/components/forms';
 import { AiRequestInput } from '@/api/chat/route';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { LoadingSpinner } from '@/components/loading';
 
 type FormData = { chatInput: string };
 
@@ -140,7 +141,7 @@ export const ChatInputForm: React.FC<ChatInputFormProps> = ({
             aria-label="Send"
           >
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <LoadingSpinner size="sm" />
             ) : (
               <Sparkles className="h-5 w-5" />
             )}

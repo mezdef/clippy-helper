@@ -3,6 +3,7 @@ import React, { JSX, useState, useEffect, useRef } from 'react';
 import { MessageSquare, Trash2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SidebarMenu, type SidebarMenuRef } from '@/components/layout';
+import { LoadingSpinner } from '@/components/loading';
 import type { Conversation } from '@/db/schema';
 
 export const ConversationList: React.FC = (): JSX.Element => {
@@ -60,9 +61,8 @@ export const ConversationList: React.FC = (): JSX.Element => {
   const renderConversationList = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center p-4">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-          <span className="ml-2">Loading conversations...</span>
+        <div className="p-4">
+          <LoadingSpinner size="sm" text="Loading conversations..." />
         </div>
       );
     }

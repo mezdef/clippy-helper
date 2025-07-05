@@ -3,6 +3,7 @@ import React, { JSX } from 'react';
 import { useMessagesContext } from './MessagesContext';
 import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
+import { LoadingSpinner } from '@/components/loading';
 
 interface MessageListProps {
   conversationTitle?: string;
@@ -18,8 +19,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2">Loading messages...</span>
+        <LoadingSpinner size="lg" text="Loading messages..." />
       </div>
     );
   }
