@@ -10,11 +10,6 @@ import { useConversation } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
 import type { Conversation, Message } from '@/db/schema';
 
-// Extended type for conversation with messages
-type ConversationWithMessages = Conversation & {
-  messages: Message[];
-};
-
 export default function ConversationPage(): JSX.Element {
   const params = useParams();
   const conversationId = params.id as string;
