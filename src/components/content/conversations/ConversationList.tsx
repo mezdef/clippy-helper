@@ -2,7 +2,7 @@
 import React, { JSX, forwardRef } from 'react';
 import { Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { LoadingSpinner } from '@/components/loading';
+import { LoadingSpinner } from '@/components/ui/loading';
 import {
   useConversations,
   useCreateConversation,

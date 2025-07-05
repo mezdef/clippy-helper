@@ -5,7 +5,7 @@ import { MessageList } from '@/components/content/messages';
 import { ChatInputForm } from '@/components/content/messages';
 import { MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import { LoadingPage } from '@/components/loading';
+import { LoadingPage } from '@/components/ui/loading';
 import { useConversation } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
 import type { Conversation, Message } from '@/db/schema';

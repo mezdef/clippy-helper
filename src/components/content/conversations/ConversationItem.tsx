@@ -1,7 +1,7 @@
 'use client';
 import React, { JSX } from 'react';
 import { MessageSquare, Trash2 } from 'lucide-react';
-import { LoadingSpinner } from '@/components/loading';
+import { LoadingSpinner } from '@/components/ui/loading';
 import type { Conversation } from '@/db/schema';
 
 interface ConversationItemProps {

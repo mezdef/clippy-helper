@@ -1,8 +1,8 @@
 'use client';
 import React, { JSX, useState } from 'react';
-import { Form, Input } from '@/components/forms';
+import { Form, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
-import { LoadingSpinner } from '@/components/loading';
+import { LoadingSpinner } from '@/components/ui/loading';
 import { useChatInput } from '@/hooks/useChatInput';
 
 interface ChatInputFormProps {
