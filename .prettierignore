@@ -29,6 +29,7 @@ pnpm-lock.yaml
 
 # Drizzle ORM
 migrations/
+drizzle/
 drizzle.config.ts
 
 # Misc
