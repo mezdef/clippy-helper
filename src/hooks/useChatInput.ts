@@ -13,6 +13,7 @@ interface UseChatInputProps {
 interface UseChatInputReturn {
   methods: ReturnType<typeof useForm<FormData>>;
   onSubmit: (data: FormData) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 export const useChatInput = ({
@@ -21,6 +22,7 @@ export const useChatInput = ({
   const methods = useForm<FormData>();
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sendChatRequest = async (
     aiRequests: AiRequestInput[]
@@ -40,6 +42,7 @@ export const useChatInput = ({
   };
 
   const onSubmit = async (data: FormData): Promise<void> => {
+    setIsSubmitting(true);
     try {
       // Save user message to database first
       await createMessageMutation.mutateAsync({
@@ -85,6 +88,7 @@ export const useChatInput = ({
       console.error('Error in chat submission:', err);
       throw err;
     } finally {
+      setIsSubmitting(false);
       methods.reset();
     }
   };
@@ -92,5 +96,6 @@ export const useChatInput = ({
   return {
     methods,
     onSubmit,
+    isSubmitting,
   };
 };

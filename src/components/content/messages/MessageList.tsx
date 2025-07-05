@@ -1,7 +1,8 @@
 'use client';
-import React, { JSX } from 'react';
+import React, { JSX, useRef, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
+import { TypingIndicator } from './TypingIndicator';
 
 interface MessageType {
   role: 'user' | 'assistant';
@@ -15,6 +16,7 @@ interface MessageListProps {
   conversationTitle?: string;
   conversationCreatedAt?: string;
   onReAsk?: (text: string, messageId: string) => void;
+  isTyping?: boolean;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -22,9 +24,31 @@ export const MessageList: React.FC<MessageListProps> = ({
   conversationTitle,
   conversationCreatedAt,
   onReAsk,
+  isTyping = false,
 }): JSX.Element => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom when messages change or typing indicator appears
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const scrollToBottom = () => {
+        scrollContainerRef.current?.scrollTo({
+          top: scrollContainerRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      };
+
+      // Use a small delay to ensure DOM updates are complete
+      const timeoutId = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages.length, isTyping]);
+
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto p-8 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div
+      ref={scrollContainerRef}
+      className="flex-1 min-h-0 overflow-y-auto p-8 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]"
+    >
       {/* Conversation Info */}
       {conversationTitle && (
         <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
@@ -58,6 +82,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               onReAsk={onReAsk}
             />
           ))}
+          {isTyping && <TypingIndicator />}
         </div>
       )}
     </div>

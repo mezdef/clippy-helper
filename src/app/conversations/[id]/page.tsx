@@ -142,6 +142,7 @@ export default function ConversationPage(): JSX.Element {
           conversation.createdAt
         ).toLocaleDateString()}
         onReAsk={handleReAsk}
+        isTyping={chatInputRef.current?.isSubmitting || false}
       />
       <ChatInputForm
         ref={chatInputRef}

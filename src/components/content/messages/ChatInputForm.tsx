@@ -13,12 +13,14 @@ interface ChatInputFormProps {
 export interface ChatInputFormRef {
   setValue: (value: string) => void;
   focus: () => void;
+  isSubmitting: boolean;
 }
 
 export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
   ({ conversationId, onMessageSubmitted }, ref): JSX.Element => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const { methods, onSubmit } = useChatInput({ conversationId });
+    const { methods, onSubmit, isSubmitting } = useChatInput({
+      conversationId,
+    });
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
@@ -32,17 +34,17 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
           input.focus();
         }
       },
+      isSubmitting,
     }));
 
     const handleSubmit = async (data: { chatInput: string }) => {
-      setIsSubmitting(true);
       try {
         // Trigger cleanup immediately before creating the new message
         onMessageSubmitted?.();
         // Then create the new message
         await onSubmit(data);
-      } finally {
-        setIsSubmitting(false);
+      } catch (error) {
+        console.error('Error submitting message:', error);
       }
     };
 
