@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ConversationList } from '@/components/content/conversations';
+import { SidebarContainer } from '@/components/layout';
 import { Providers } from '@/components/providers';
 
 const geistSans = Geist({
@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <Providers>
           <div className="flex h-screen">
-            <ConversationList />
+            <SidebarContainer />
             <main className="flex-1 overflow-hidden">{children}</main>
           </div>
         </Providers>

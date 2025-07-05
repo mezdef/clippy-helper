@@ -1,13 +1,13 @@
 'use client';
 import React, {
   JSX,
-  useState,
   useEffect,
   ReactNode,
   useImperativeHandle,
   forwardRef,
 } from 'react';
 import { MessagesSquare, X } from 'lucide-react';
+import { useSidebar } from '@/hooks/useSidebar';
 
 interface SidebarMenuProps {
   children: ReactNode;
@@ -16,6 +16,7 @@ interface SidebarMenuProps {
   closeButtonTitle?: string;
   className?: string;
   onClose?: () => void;
+  sidebarId?: string;
 }
 
 export interface SidebarMenuRef {
@@ -31,23 +32,19 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
       closeButtonTitle = 'Close menu',
       className = '',
       onClose,
+      sidebarId = 'default',
     },
     ref
   ) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-
-    const toggleSidebar = () => {
-      setIsOpen(!isOpen);
-    };
-
-    const closeSidebar = () => {
-      setIsOpen(false);
-      onClose?.();
-    };
+    const { isOpen, closeSidebar, toggleSidebar, isLoading } =
+      useSidebar(sidebarId);
 
     // Expose close function to parent component
     useImperativeHandle(ref, () => ({
-      close: closeSidebar,
+      close: () => {
+        closeSidebar();
+        onClose?.();
+      },
     }));
 
     // Prevent body scroll when sidebar is open
@@ -63,11 +60,17 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
       };
     }, [isOpen]);
 
+    const handleClose = () => {
+      closeSidebar();
+      onClose?.();
+    };
+
     return (
       <>
         <button
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-40 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+          disabled={isLoading}
+          className="fixed top-4 left-4 z-40 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           title={triggerButtonTitle}
         >
           <MessagesSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -76,7 +79,7 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
         {isOpen && (
           <div
             className="fixed inset-0 bg-black opacity-50 z-50 transition-opacity cursor-pointer"
-            onClick={closeSidebar}
+            onClick={handleClose}
           />
         )}
 
@@ -91,8 +94,9 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
                 {title}
               </h2>
               <button
-                onClick={closeSidebar}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer disabled:opacity-50"
                 title={closeButtonTitle}
               >
                 <X className="h-5 w-5" />
