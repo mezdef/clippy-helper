@@ -13,6 +13,7 @@
     "lint:fix": "bunx --bun next lint --fix"
   },
   "dependencies": {
+    "lucide-react": "^0.525.0",
     "next": "15.3.4",
     "openai": "^5.8.2",
     "postgres": "^3.4.7",

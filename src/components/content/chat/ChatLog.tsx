@@ -3,7 +3,14 @@ import { useChatContext } from './ChatContext';
 
 export const ChatLog: React.FC = (): JSX.Element => {
   const { submitted, responses, error } = useChatContext();
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = (): void => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatLog]);
   return (
     <main className="flex-1 p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       {submitted && (
@@ -27,6 +34,7 @@ export const ChatLog: React.FC = (): JSX.Element => {
             ))}
           </ul>
         </div>
+          <div ref={chatEndRef} />
       )}
       {error && (
         <div className="mt-4 p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-200 max-w-xl">

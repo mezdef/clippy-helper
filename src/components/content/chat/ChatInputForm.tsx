@@ -1,7 +1,8 @@
 import React, { JSX } from 'react';
 import { useForm } from 'react-hook-form';
 import { useChatContext } from './ChatContext';
-import { Form, Textarea } from '@/components/forms';
+import { Form, Input } from '@/components/forms';
+import { Sparkles, Loader2 } from 'lucide-react';
 
 type FormData = { chatInput: string };
 
@@ -34,27 +35,34 @@ export const ChatInputForm: React.FC = (): JSX.Element => {
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4">
       <div className="max-w-4xl mx-auto">
         <Form
           onSubmit={onSubmit}
           methods={methods}
-          className="flex flex-col gap-2 w-full"
+          className="flex flex-row gap-2 w-full items-end"
         >
-          <Textarea
-            id="chatInput"
-            label="Ask Clippy for something..."
-            placeholder="I'd like to write a letter..."
-          />
+          <div className="flex-1">
+            <Input
+              id="chatInput"
+              label="Ask Clippy for something..."
+              placeholder="I'd like to write a letter..."
+            />
+          </div>
           <button
             type="submit"
-            className="mt-2 bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="bg-blue-600 text-white rounded p-3 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
             disabled={loading}
+            aria-label="Send"
           >
-            {loading ? 'Loading...' : 'Submit'}
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Sparkles className="h-5 w-5" />
+            )}
           </button>
         </Form>
       </div>
-    </footer>
+    </div>
   );
 };
