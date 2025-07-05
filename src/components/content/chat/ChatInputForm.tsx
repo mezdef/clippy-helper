@@ -1,31 +1,64 @@
+'use client';
 import React, { JSX } from 'react';
 import { useForm } from 'react-hook-form';
-import { useChatContext } from './ChatContext';
+import { ChatLogType, useChatContext } from './ChatContext';
 import { Form, Input } from '@/components/forms';
+import { AiRequestInput } from '@/app/api/chat/route';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 type FormData = { chatInput: string };
 
 export const ChatInputForm: React.FC = (): JSX.Element => {
   const methods = useForm<FormData>();
-  const { setSubmitted, setResponses, setLoading, setError, loading } =
-    useChatContext();
+  const {
+    chatLog,
+    setChatLog,
+    aiRequests,
+    aiResponses,
+    setAiRequests,
+    setAiResponses,
+    setLoading,
+    setError,
+    loading,
+  } = useChatContext();
 
-  const onSubmit = async (data: FormData) => {
-    setSubmitted(data.chatInput);
-    // setResponses();
+  const onSubmit = async (data: FormData): Promise<void> => {
+    const newChatLog: ChatLogType[] = [
+      ...chatLog,
+      {
+        role: 'user',
+        text: data.chatInput,
+      },
+    ];
+    const newAiRequests: AiRequestInput[] = [
+      ...aiRequests,
+      {
+        role: 'user',
+        content: data.chatInput,
+      },
+    ];
+    setChatLog(newChatLog);
+    setAiRequests(newAiRequests);
     setError(null);
     setLoading(true);
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatInput: data.chatInput }),
+        body: JSON.stringify(newAiRequests),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Unknown error');
-      console.log('result:', result);
-      setResponses(result);
+      // Update the chatLog with the ai's response
+      setChatLog([
+        ...newChatLog,
+        {
+          role: 'assistant',
+          content: result.output_parsed,
+        },
+      ]);
+      // Update the aiResponses with the ai's response
+      setAiResponses([...aiResponses, result]);
     } catch (err) {
       setError((err as Error).message);
     } finally {

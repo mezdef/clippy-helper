@@ -1,3 +1,4 @@
+'use client';
 import React, {
   createContext,
   useContext,
@@ -5,15 +6,28 @@ import React, {
   JSX,
   useEffect,
 } from 'react';
-import { StructuredResponse } from '@/app/api/chat/route';
+import {
+  AiResponseStructured,
+  AiRequestInput,
+  AdviceListType,
+} from '@/app/api/chat/route';
+
+export interface ChatLogType {
+  role: 'system' | 'user' | 'assistant';
+  title?: string;
+  text?: string;
+  content?: AdviceListType;
+}
 
 interface ChatContextType {
-  submitted: string;
-  responses: StructuredResponse | undefined;
+  chatLog: ChatLogType[];
+  aiRequests: AiRequestInput[];
+  aiResponses: AiResponseStructured[];
   loading: boolean;
   error: string | null;
-  setSubmitted: (value: string) => void;
-  setResponses: (value: StructuredResponse) => void;
+  setChatLog: (value: ChatLogType[]) => void;
+  setAiRequests: (value: AiRequestInput[]) => void;
+  setAiResponses: (value: AiResponseStructured[]) => void;
   setLoading: (value: boolean) => void;
   setError: (value: string | null) => void;
 }
@@ -31,18 +45,21 @@ export const useChatContext = (): ChatContextType => {
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }): JSX.Element => {
-  const [submitted, setSubmitted] = useState('');
-  const [responses, setResponses] = useState<StructuredResponse | undefined>();
-  const [loading, setLoading] = useState(false);
+  const [chatLog, setChatLog] = useState<ChatLogType[]>([]);
+  const [aiRequests, setAiRequests] = useState<AiRequestInput[]>([]);
+  const [aiResponses, setAiResponses] = useState<AiResponseStructured[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const value: ChatContextType = {
-    submitted,
-    responses,
+    chatLog,
+    aiRequests,
+    aiResponses,
     loading,
     error,
-    setSubmitted,
-    setResponses,
+    setChatLog,
+    setAiRequests,
+    setAiResponses,
     setLoading,
     setError,
   };
