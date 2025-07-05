@@ -2,7 +2,7 @@
 import React, { JSX } from 'react';
 import { MessageSquare, Menu } from 'lucide-react';
 
-export const HomeContent: React.FC = (): JSX.Element => {
+const HomeContent: React.FC = (): JSX.Element => {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}

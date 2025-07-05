@@ -27,9 +27,7 @@ export interface AiRequestInput {
   content: string;
 }
 
-export async function POST(
-  req: NextRequest
-): Promise<AiResponseStructured | NextResponse> {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const chatLog = await req.json();
     if (!chatLog || typeof chatLog[chatLog.length - 1].content !== 'string') {
