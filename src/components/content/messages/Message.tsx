@@ -1,22 +1,26 @@
 'use client';
 import React, { JSX } from 'react';
-import { ListItemType, AdviceListType } from '@/api/chat/route';
 import { Bot, User, RotateCcw } from 'lucide-react';
 
 interface MessageProps {
   role: 'user' | 'assistant';
   text?: string;
-  content?: AdviceListType;
   messageId?: string;
   onReAsk?: (text: string, messageId: string) => void;
+  excerpts?: Array<{
+    id: string;
+    title: string;
+    content: string;
+    order: string;
+  }>;
 }
 
 export const Message: React.FC<MessageProps> = ({
   role,
   text,
-  content,
   messageId,
   onReAsk,
+  excerpts = [],
 }): JSX.Element => {
   const isUser = role === 'user';
   const Icon = isUser ? User : Bot;
@@ -62,28 +66,23 @@ export const Message: React.FC<MessageProps> = ({
             </div>
           )}
 
-          {/* Display structured content */}
-          {content && (
+          {/* Display excerpts from database */}
+          {!isUser && excerpts.length > 0 && (
             <div className={`border-l-4 ${borderColor} pl-4`}>
-              <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
-                {content.title}
-              </h4>
               <ul className="space-y-2">
-                {content.list.map(
-                  (listItem: ListItemType, listIndex: number) => (
-                    <li
-                      key={listIndex}
-                      className="border-l-2 border-blue-300 pl-3"
-                    >
-                      <h5 className="font-medium text-blue-700 dark:text-blue-300">
-                        {listItem.title}
-                      </h5>
-                      <p className="text-sm whitespace-pre-line">
-                        {listItem.content}
-                      </p>
-                    </li>
-                  )
-                )}
+                {excerpts.map(excerpt => (
+                  <li
+                    key={excerpt.id}
+                    className="border-l-2 border-blue-300 pl-3"
+                  >
+                    <h5 className="font-medium text-blue-700 dark:text-blue-300">
+                      {excerpt.title}
+                    </h5>
+                    <p className="text-sm whitespace-pre-line">
+                      {excerpt.content}
+                    </p>
+                  </li>
+                ))}
               </ul>
             </div>
           )}

@@ -75,13 +75,13 @@ export const useChatInput = ({
       // Get AI response
       const result = await sendChatRequest(newAiRequests);
 
-      // Save AI message to database
+      // Save AI message to database with excerpts
       await createMessageMutation.mutateAsync({
         conversationId,
         messageData: {
           role: 'assistant',
           content: JSON.stringify(result.output_parsed),
-          structuredContent: result.output_parsed,
+          aiResponse: result.output_parsed,
         },
       });
     } catch (err) {

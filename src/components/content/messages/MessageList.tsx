@@ -7,8 +7,13 @@ import { TypingIndicator } from './TypingIndicator';
 interface MessageType {
   role: 'user' | 'assistant';
   text: string;
-  content?: any;
   id?: string;
+  excerpts?: Array<{
+    id: string;
+    title: string;
+    content: string;
+    order: string;
+  }>;
 }
 
 interface MessageListProps {
@@ -77,9 +82,9 @@ export const MessageList: React.FC<MessageListProps> = ({
               key={message.id || index}
               role={message.role}
               text={message.text}
-              content={message.content}
               messageId={message.id}
               onReAsk={onReAsk}
+              excerpts={message.excerpts}
             />
           ))}
           {isTyping && <TypingIndicator />}

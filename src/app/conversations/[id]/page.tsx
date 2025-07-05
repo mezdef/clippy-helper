@@ -12,7 +12,7 @@ import { LoadingPage } from '@/components/ui/loading';
 import { useConversation } from '@/hooks/useConversations';
 import { useMessages, useDeleteMessage } from '@/hooks/useMessages';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Conversation, Message } from '@/db/schema';
+import type { Conversation, Message, MessageWithExcerpts } from '@/db/schema';
 
 export default function ConversationPage(): JSX.Element {
   const params = useParams();
@@ -42,8 +42,10 @@ export default function ConversationPage(): JSX.Element {
   const handleMessageSubmitted = async () => {
     if (reAskedMessageId) {
       const currentMessages =
-        (queryClient.getQueryData(['messages', conversationId]) as Message[]) ||
-        [];
+        (queryClient.getQueryData([
+          'messages',
+          conversationId,
+        ]) as MessageWithExcerpts[]) || [];
 
       const messageIndex = currentMessages.findIndex(
         msg => msg.id === reAskedMessageId
@@ -130,7 +132,7 @@ export default function ConversationPage(): JSX.Element {
     id: msg.id,
     role: msg.role as 'user' | 'assistant',
     text: msg.content,
-    content: msg.structuredContent as any,
+    excerpts: msg.excerpts,
   }));
 
   return (

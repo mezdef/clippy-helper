@@ -24,7 +24,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { role, content, structuredContent } = await req.json();
+    const { role, content, aiResponse } = await req.json();
 
     if (!role || !content) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(
       conversationId: id,
       role,
       content,
-      structuredContent,
+      aiResponse,
     });
 
     return NextResponse.json(message, { status: 201 });

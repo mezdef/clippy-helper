@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Message } from '@/db/schema';
+import type { Message, MessageWithExcerpts } from '@/db/schema';
 
 // Fetch messages for a conversation
 export const useMessages = (conversationId: string) => {
   return useQuery({
     queryKey: ['messages', conversationId],
-    queryFn: async (): Promise<Message[]> => {
+    queryFn: async (): Promise<MessageWithExcerpts[]> => {
       const response = await fetch(
         `/api/conversations/${conversationId}/messages`
       );
@@ -28,8 +28,8 @@ export const useCreateMessage = () => {
       messageData,
     }: {
       conversationId: string;
-      messageData: { role: string; content: string; structuredContent?: any };
-    }): Promise<Message> => {
+      messageData: { role: string; content: string; aiResponse?: any };
+    }): Promise<MessageWithExcerpts> => {
       const response = await fetch(
         `/api/conversations/${conversationId}/messages`,
         {
@@ -49,7 +49,7 @@ export const useCreateMessage = () => {
       // Add the new message to the messages cache
       queryClient.setQueryData(
         ['messages', conversationId],
-        (old: Message[] | undefined) =>
+        (old: MessageWithExcerpts[] | undefined) =>
           old ? [...old, newMessage] : [newMessage]
       );
 
@@ -111,7 +111,7 @@ export const useUpdateMessage = () => {
     }: {
       conversationId: string;
       messageId: string;
-      messageData: { role?: string; content?: string; structuredContent?: any };
+      messageData: { role?: string; content?: string };
     }): Promise<Message> => {
       const response = await fetch(
         `/api/conversations/${conversationId}/messages/${messageId}`,
