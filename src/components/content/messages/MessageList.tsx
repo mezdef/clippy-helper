@@ -7,18 +7,21 @@ interface MessageType {
   role: 'user' | 'assistant';
   text: string;
   content?: any;
+  id?: string;
 }
 
 interface MessageListProps {
   messages: MessageType[];
   conversationTitle?: string;
   conversationCreatedAt?: string;
+  onReAsk?: (text: string, messageId: string) => void;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
   messages,
   conversationTitle,
   conversationCreatedAt,
+  onReAsk,
 }): JSX.Element => {
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-8 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -47,10 +50,12 @@ export const MessageList: React.FC<MessageListProps> = ({
         <div className="space-y-6">
           {messages.map((message: MessageType, index: number) => (
             <Message
-              key={index}
+              key={message.id || index}
               role={message.role}
               text={message.text}
               content={message.content}
+              messageId={message.id}
+              onReAsk={onReAsk}
             />
           ))}
         </div>

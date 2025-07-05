@@ -1,18 +1,22 @@
 'use client';
 import React, { JSX } from 'react';
 import { ListItemType, AdviceListType } from '@/api/chat/route';
-import { Bot, User } from 'lucide-react';
+import { Bot, User, RotateCcw } from 'lucide-react';
 
 interface MessageProps {
   role: 'user' | 'assistant';
   text?: string;
   content?: AdviceListType;
+  messageId?: string;
+  onReAsk?: (text: string, messageId: string) => void;
 }
 
 export const Message: React.FC<MessageProps> = ({
   role,
   text,
   content,
+  messageId,
+  onReAsk,
 }): JSX.Element => {
   const isUser = role === 'user';
   const Icon = isUser ? User : Bot;
@@ -41,7 +45,21 @@ export const Message: React.FC<MessageProps> = ({
         <div className="space-y-3">
           {/* Display text content */}
           {isUser && text && (
-            <p className="whitespace-pre-line text-sm">{text}</p>
+            <div className="space-y-2">
+              <p className="whitespace-pre-line text-sm">{text}</p>
+              {onReAsk && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => onReAsk(text, messageId!)}
+                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium cursor-pointer flex items-center gap-1 transition-colors"
+                    title="Re-ask this question"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Re-ask
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Display structured content */}

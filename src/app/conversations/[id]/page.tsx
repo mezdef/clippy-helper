@@ -1,18 +1,25 @@
 'use client';
-import React, { JSX } from 'react';
+import React, { JSX, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { MessageList } from '@/components/content/messages';
-import { ChatInputForm } from '@/components/content/messages';
+import {
+  ChatInputForm,
+  type ChatInputFormRef,
+} from '@/components/content/messages';
 import { MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/loading';
 import { useConversation } from '@/hooks/useConversations';
-import { useMessages } from '@/hooks/useMessages';
+import { useMessages, useDeleteMessage } from '@/hooks/useMessages';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Conversation, Message } from '@/db/schema';
 
 export default function ConversationPage(): JSX.Element {
   const params = useParams();
   const conversationId = params.id as string;
+  const chatInputRef = useRef<ChatInputFormRef>(null);
+  const [reAskedMessageId, setReAskedMessageId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     data: conversation,
@@ -24,6 +31,42 @@ export default function ConversationPage(): JSX.Element {
     isLoading: messagesLoading,
     error: messagesError,
   } = useMessages(conversationId);
+  const deleteMessageMutation = useDeleteMessage();
+
+  const handleReAsk = (text: string, messageId: string) => {
+    chatInputRef.current?.setValue(text);
+    chatInputRef.current?.focus();
+    setReAskedMessageId(messageId);
+  };
+
+  const handleMessageSubmitted = async () => {
+    if (reAskedMessageId) {
+      const currentMessages =
+        (queryClient.getQueryData(['messages', conversationId]) as Message[]) ||
+        [];
+
+      const messageIndex = currentMessages.findIndex(
+        msg => msg.id === reAskedMessageId
+      );
+
+      if (messageIndex !== -1) {
+        const messagesToDelete = currentMessages.slice(messageIndex);
+
+        try {
+          for (const message of messagesToDelete) {
+            await deleteMessageMutation.mutateAsync({
+              conversationId,
+              messageId: message.id,
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting messages:', error);
+        }
+      }
+
+      setReAskedMessageId(null);
+    }
+  };
 
   if (conversationLoading) {
     return <LoadingPage text="Loading conversation..." />;
@@ -84,6 +127,7 @@ export default function ConversationPage(): JSX.Element {
 
   // Convert messages to the format expected by MessageList
   const formattedMessages = messages.map(msg => ({
+    id: msg.id,
     role: msg.role as 'user' | 'assistant',
     text: msg.content,
     content: msg.structuredContent as any,
@@ -97,8 +141,13 @@ export default function ConversationPage(): JSX.Element {
         conversationCreatedAt={new Date(
           conversation.createdAt
         ).toLocaleDateString()}
+        onReAsk={handleReAsk}
       />
-      <ChatInputForm conversationId={conversationId} />
+      <ChatInputForm
+        ref={chatInputRef}
+        conversationId={conversationId}
+        onMessageSubmitted={handleMessageSubmitted}
+      />
     </div>
   );
 }

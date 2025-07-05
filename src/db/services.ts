@@ -111,4 +111,14 @@ export const messageService = {
   async delete(id: string) {
     await db.delete(messages).where(eq(messages.id, id));
   },
+
+  // Update a message
+  async update(id: string, data: Partial<NewMessage>) {
+    const [message] = await db
+      .update(messages)
+      .set(data)
+      .where(eq(messages.id, id))
+      .returning();
+    return message;
+  },
 };
