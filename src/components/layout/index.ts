@@ -1,1 +1,1 @@
-export { SidebarMenu } from './SidebarMenu';
+export { SidebarMenu, type SidebarMenuRef } from './SidebarMenu';

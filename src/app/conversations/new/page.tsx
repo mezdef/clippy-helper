@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { MessagesProvider } from '@/components/content/messages';
 import { MessageList } from '@/components/content/messages';
 import { ChatInputForm } from '@/components/content/messages';
-import { ConversationList } from '@/components/content/conversations';
 
 export default function NewConversationPage(): JSX.Element {
   const router = useRouter();
@@ -17,14 +16,11 @@ export default function NewConversationPage(): JSX.Element {
   };
 
   return (
-    <>
-      <ConversationList />
-      <div className="flex flex-col h-screen">
-        <MessagesProvider>
-          <MessageList conversationTitle="New Conversation" />
-          <ChatInputForm onConversationCreated={handleConversationCreated} />
-        </MessagesProvider>
-      </div>
-    </>
+    <div className="flex flex-col h-screen">
+      <MessagesProvider>
+        <MessageList conversationTitle="New Conversation" />
+        <ChatInputForm onConversationCreated={handleConversationCreated} />
+      </MessagesProvider>
+    </div>
   );
 }

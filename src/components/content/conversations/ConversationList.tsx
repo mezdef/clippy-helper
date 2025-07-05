@@ -1,12 +1,13 @@
 'use client';
-import React, { JSX, useState, useEffect } from 'react';
+import React, { JSX, useState, useEffect, useRef } from 'react';
 import { MessageSquare, Trash2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { SidebarMenu } from '@/components/layout';
+import { SidebarMenu, type SidebarMenuRef } from '@/components/layout';
 import type { Conversation } from '@/db/schema';
 
 export const ConversationList: React.FC = (): JSX.Element => {
   const router = useRouter();
+  const sidebarRef = useRef<SidebarMenuRef>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,12 +48,13 @@ export const ConversationList: React.FC = (): JSX.Element => {
   };
 
   const startNewChat = () => {
-    // Navigate to the new conversation page
     router.push('/conversations/new');
+    sidebarRef.current?.close();
   };
 
   const handleConversationClick = (conversationId: string) => {
     router.push(`/conversations/${conversationId}`);
+    sidebarRef.current?.close();
   };
 
   const renderConversationList = () => {
@@ -111,13 +113,10 @@ export const ConversationList: React.FC = (): JSX.Element => {
 
   return (
     <SidebarMenu
+      ref={sidebarRef}
       title="Conversations"
       triggerButtonTitle="Open conversations"
       closeButtonTitle="Close conversations"
-      onClose={() => {
-        // The sidebar will close automatically when navigating
-        // This callback can be used for any additional cleanup if needed
-      }}
     >
       <div className="flex items-center justify-between mb-4">
         <button

@@ -7,7 +7,6 @@ import {
 } from '@/components/content/messages';
 import { MessageList } from '@/components/content/messages';
 import { ChatInputForm } from '@/components/content/messages';
-import { ConversationList } from '@/components/content/conversations';
 import { MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type { Conversation } from '@/db/schema';
@@ -192,16 +191,13 @@ export default function ConversationPage(): JSX.Element {
   }
 
   return (
-    <>
-      <ConversationList />
-      <div className="flex flex-col h-screen">
-        <MessagesProvider>
-          <ConversationContent
-            conversationId={conversationId}
-            conversation={currentConversation}
-          />
-        </MessagesProvider>
-      </div>
-    </>
+    <div className="flex flex-col h-screen">
+      <MessagesProvider>
+        <ConversationContent
+          conversationId={conversationId}
+          conversation={currentConversation}
+        />
+      </MessagesProvider>
+    </div>
   );
 }
