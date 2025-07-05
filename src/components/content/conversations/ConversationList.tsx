@@ -1,56 +1,42 @@
 'use client';
-import React, { JSX, useState, useEffect, useRef } from 'react';
+import React, { JSX, useRef } from 'react';
 import { MessageSquare, Trash2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SidebarMenu, type SidebarMenuRef } from '@/components/layout';
 import { LoadingSpinner } from '@/components/loading';
+import {
+  useConversations,
+  useCreateConversation,
+  useDeleteConversation,
+} from '@/hooks/useConversations';
 import type { Conversation } from '@/db/schema';
 
 export const ConversationList: React.FC = (): JSX.Element => {
   const router = useRouter();
   const sidebarRef = useRef<SidebarMenuRef>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch conversations on mount
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/conversations');
-        if (response.ok) {
-          const data = await response.json();
-          setConversations(data);
-        }
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-        setError('Failed to fetch conversations');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: conversations = [], isLoading, error } = useConversations();
+  const createConversationMutation = useCreateConversation();
+  const deleteConversationMutation = useDeleteConversation();
 
-    fetchConversations();
-  }, []);
-
-  const deleteConversation = async (id: string) => {
+  const handleNewConversation = async () => {
     try {
-      const response = await fetch(`/api/conversations/${id}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setConversations(conversations.filter(conv => conv.id !== id));
-      }
+      const newConversation = await createConversationMutation.mutateAsync(
+        `Chat ${new Date().toLocaleString()}`
+      );
+      router.push(`/conversations/${newConversation.id}`);
+      sidebarRef.current?.close();
     } catch (error) {
-      console.error('Error deleting conversation:', error);
-      setError('Failed to delete conversation');
+      console.error('Error creating conversation:', error);
     }
   };
 
-  const startNewChat = () => {
-    router.push('/conversations/new');
-    sidebarRef.current?.close();
+  const handleDeleteConversation = async (id: string) => {
+    try {
+      await deleteConversationMutation.mutateAsync(id);
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+    }
   };
 
   const handleConversationClick = (conversationId: string) => {
@@ -59,10 +45,18 @@ export const ConversationList: React.FC = (): JSX.Element => {
   };
 
   const renderConversationList = () => {
-    if (loading) {
+    if (isLoading) {
       return (
         <div className="p-4">
           <LoadingSpinner size="sm" text="Loading conversations..." />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="p-4">
+          <p className="text-red-600 text-sm">Error loading conversations</p>
         </div>
       );
     }
@@ -99,11 +93,16 @@ export const ConversationList: React.FC = (): JSX.Element => {
               </button>
             </div>
             <button
-              onClick={() => deleteConversation(conversation.id)}
-              className="p-1 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+              onClick={() => handleDeleteConversation(conversation.id)}
+              disabled={deleteConversationMutation.isPending}
+              className="p-1 text-gray-400 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
               title="Delete conversation"
             >
-              <Trash2 className="h-4 w-4" />
+              {deleteConversationMutation.isPending ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </button>
           </div>
         ))}
@@ -120,13 +119,23 @@ export const ConversationList: React.FC = (): JSX.Element => {
     >
       <div className="flex items-center justify-between mb-4">
         <button
-          onClick={startNewChat}
-          className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
+          onClick={handleNewConversation}
+          disabled={createConversationMutation.isPending}
+          className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          {createConversationMutation.isPending ? (
+            <LoadingSpinner size="sm" />
+          ) : (
+            <Plus className="h-4 w-4 mr-2" />
+          )}
           New Conversation
         </button>
       </div>
+      {createConversationMutation.error && (
+        <div className="mb-4 p-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded">
+          {createConversationMutation.error.message}
+        </div>
+      )}
       {renderConversationList()}
     </SidebarMenu>
   );

@@ -3,10 +3,11 @@ import { messageService } from '@/db/services';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const messages = await messageService.getByConversationId(params.id);
+    const { id } = await params;
+    const messages = await messageService.getByConversationId(id);
     return NextResponse.json(messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -19,9 +20,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { role, content, structuredContent } = await req.json();
 
     if (!role || !content) {
@@ -32,7 +34,7 @@ export async function POST(
     }
 
     const message = await messageService.create({
-      conversationId: params.id,
+      conversationId: id,
       role,
       content,
       structuredContent,

@@ -34,6 +34,36 @@ export const conversationService = {
     return conversation;
   },
 
+  // Get a conversation by ID with associated messages using join
+  async getByIdWithMessages(id: string) {
+    const result = await db
+      .select({
+        conversation: conversations,
+        message: messages,
+      })
+      .from(conversations)
+      .leftJoin(messages, eq(conversations.id, messages.conversationId))
+      .where(eq(conversations.id, id))
+      .orderBy(messages.createdAt);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    // Extract conversation data (same for all rows)
+    const conversation = result[0].conversation;
+
+    // Extract and filter messages (remove null entries from left join)
+    const conversationMessages = result
+      .map(row => row.message)
+      .filter(message => message !== null);
+
+    return {
+      ...conversation,
+      messages: conversationMessages,
+    };
+  },
+
   // Update conversation title
   async updateTitle(id: string, title: string) {
     const [conversation] = await db

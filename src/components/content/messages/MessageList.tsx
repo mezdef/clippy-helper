@@ -1,29 +1,25 @@
 'use client';
 import React, { JSX } from 'react';
-import { useMessagesContext } from './MessagesContext';
 import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
-import { LoadingSpinner } from '@/components/loading';
+
+interface MessageType {
+  role: 'user' | 'assistant';
+  text: string;
+  content?: any;
+}
 
 interface MessageListProps {
+  messages: MessageType[];
   conversationTitle?: string;
   conversationCreatedAt?: string;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
+  messages,
   conversationTitle,
   conversationCreatedAt,
 }): JSX.Element => {
-  const { messages, loading } = useMessagesContext();
-
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Loading messages..." />
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-8 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       {/* Conversation Info */}
@@ -49,7 +45,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       ) : (
         <div className="space-y-6">
-          {messages.map((message: any, index: number) => (
+          {messages.map((message: MessageType, index: number) => (
             <Message
               key={index}
               role={message.role}

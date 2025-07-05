@@ -3,10 +3,11 @@ import { conversationService } from '@/db/services';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const conversation = await conversationService.getById(params.id);
+    const { id } = await params;
+    const conversation = await conversationService.getByIdWithMessages(id);
 
     if (!conversation) {
       return NextResponse.json(
@@ -27,10 +28,11 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await conversationService.delete(params.id);
+    const { id } = await params;
+    await conversationService.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting conversation:', error);
