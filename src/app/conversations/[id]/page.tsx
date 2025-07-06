@@ -1,26 +1,25 @@
 'use client';
 import React, { JSX } from 'react';
-import { MessageList } from '@/components/content/messages';
-import {
-  ChatInputForm,
-  type ChatInputFormRef,
-} from '@/components/content/messages';
-import { MessageSquare } from 'lucide-react';
-import Link from 'next/link';
-import { LoadingPage } from '@/components/ui/loading';
+import { useParams } from 'next/navigation';
 import { useConversation } from '@/hooks/useConversations';
+import { MessageList, ChatInputForm } from '@/components/content/messages';
 import { useMessageInput } from '@/hooks/useMessageInput';
+import { LoadingPage } from '@/components/ui/loading';
+import { Error as ErrorComponent } from '@/components/ui/Error';
+import { formatDate } from '@/utils/date';
 
 export default function ConversationPage(): JSX.Element {
+  const params = useParams();
+  const conversationId = params.id as string;
+
   const {
-    conversationId,
     conversation,
     messages,
     isLoading,
     hasError,
     conversationError,
     messagesError,
-  } = useConversation();
+  } = useConversation(conversationId);
 
   const { handleReAsk, handleMessageSubmitted, chatInputRef } = useMessageInput(
     {
@@ -28,44 +27,23 @@ export default function ConversationPage(): JSX.Element {
     }
   );
 
+  // Show loading state while data is being fetched
   if (isLoading) {
     return <LoadingPage text="Loading conversation..." />;
   }
 
+  // Handle errors by throwing them for the error boundary
   if (hasError) {
-    const error = conversationError || messagesError;
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <MessageSquare className="h-12 w-12 mx-auto mb-4 text-red-500" />
-          <p className="text-red-600">Error loading conversation</p>
-          <p className="text-sm text-gray-500 mt-2">{error?.message}</p>
-          <Link
-            href="/"
-            className="inline-flex items-center mt-4 text-blue-600 hover:text-blue-800"
-          >
-            Back to conversations
-          </Link>
-        </div>
-      </div>
-    );
+    const error =
+      conversationError ||
+      messagesError ||
+      new Error('Failed to load conversation');
+    throw error;
   }
 
+  // Handle not found by throwing a specific error
   if (!conversation) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">Conversation not found</p>
-          <Link
-            href="/"
-            className="inline-flex items-center mt-4 text-blue-600 hover:text-blue-800"
-          >
-            Back to conversations
-          </Link>
-        </div>
-      </div>
-    );
+    throw new Error('Conversation not found');
   }
 
   return (
@@ -73,9 +51,7 @@ export default function ConversationPage(): JSX.Element {
       <MessageList
         messages={messages}
         conversationTitle={conversation.title}
-        conversationCreatedAt={new Date(
-          conversation.createdAt
-        ).toLocaleDateString()}
+        conversationCreatedAt={formatDate(conversation.createdAt)}
         onReAsk={handleReAsk}
         isTyping={chatInputRef.current?.isSubmitting || false}
       />
