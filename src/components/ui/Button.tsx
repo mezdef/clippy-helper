@@ -2,16 +2,11 @@
 import React, { JSX } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import type { ButtonVariant, ComponentSize } from '@/types';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?:
-    | 'default'
-    | 'destructive'
-    | 'outline'
-    | 'secondary'
-    | 'ghost'
-    | 'link';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: ButtonVariant;
+  size?: ComponentSize;
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
   loading?: boolean;

@@ -5,9 +5,10 @@ import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar, Button } from '@/components/ui';
 import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
 import { EditMessageForm } from './EditMessageForm';
+import type { MessageRole, EditingStateProps } from '@/types';
 
-interface MessageProps {
-  role: 'user' | 'assistant';
+interface MessageProps extends EditingStateProps {
+  role: MessageRole;
   text?: string;
   messageId?: string;
   onEditMessage?: (text: string, messageId: string) => Promise<void>;
@@ -17,16 +18,6 @@ interface MessageProps {
     content: string;
     order: string;
   }>;
-  editingItem?: {
-    type: 'message' | 'excerpt';
-    id: string;
-  } | null;
-  setEditingItem?: React.Dispatch<
-    React.SetStateAction<{
-      type: 'message' | 'excerpt';
-      id: string;
-    } | null>
-  >;
 }
 
 export const Message: React.FC<MessageProps> = ({

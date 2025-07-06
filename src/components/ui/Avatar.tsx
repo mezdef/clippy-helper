@@ -1,9 +1,10 @@
 import React from 'react';
 import { Bot, User } from 'lucide-react';
+import type { MessageRole, ComponentSize } from '@/types';
 
 interface AvatarProps {
-  role: 'user' | 'assistant';
-  size?: 'sm' | 'md' | 'lg';
+  role: MessageRole;
+  size?: ComponentSize;
   className?: string;
 }
 
@@ -13,7 +14,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   className = '',
 }) => {
   const isUser = role === 'user';
-  const Icon = isUser ? User : Bot;
+  const Icon = isUser ? User : Bot; // Both assistant and system use Bot icon
 
   const sizeClasses = {
     sm: 'w-6 h-6',

@@ -12,7 +12,7 @@ export const messages = pgTable('messages', {
   conversationId: uuid('conversation_id')
     .references(() => conversations.id, { onDelete: 'cascade' })
     .notNull(),
-  role: text('role').notNull(), // 'user' | 'assistant' | 'system'
+  role: text('role', { enum: ['user', 'assistant', 'system'] }).notNull(),
   content: text('content').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

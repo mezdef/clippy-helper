@@ -4,10 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Save, X } from 'lucide-react';
 import { Form, FormField, Textarea } from '@/components/ui/forms';
 import { Button } from '@/components/ui';
-
-interface EditMessageFormData {
-  text: string;
-}
+import type { EditMessageFormData } from '@/types';
 
 interface EditMessageFormProps {
   message: {

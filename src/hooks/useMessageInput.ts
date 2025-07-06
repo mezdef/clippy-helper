@@ -5,16 +5,15 @@ import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
 import type { ChatInputFormRef } from '@/app/conversations/[id]/_components/messages';
 import type { FormattedMessage } from '@/services/message.service';
-
-type FormData = { chatInput: string };
+import type { ChatInputFormData } from '@/types';
 
 interface UseMessageInputProps {
   conversationId: string;
 }
 
 interface UseMessageInputReturn {
-  methods: ReturnType<typeof useForm<FormData>>;
-  onSubmit: (data: FormData) => Promise<void>;
+  methods: ReturnType<typeof useForm<ChatInputFormData>>;
+  onSubmit: (data: ChatInputFormData) => Promise<void>;
   isSubmitting: boolean;
   isEditingMessage: boolean;
   handleEditMessage: (text: string, messageId: string) => Promise<void>;
@@ -24,7 +23,11 @@ interface UseMessageInputReturn {
 export const useMessageInput = ({
   conversationId,
 }: UseMessageInputProps): UseMessageInputReturn => {
-  const methods = useForm<FormData>();
+  const methods = useForm<ChatInputFormData>({
+    defaultValues: {
+      chatInput: '',
+    },
+  });
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
   const deleteMessageMutation = useDeleteMessage();
@@ -125,7 +128,7 @@ export const useMessageInput = ({
     }
   };
 
-  const onSubmit = async (data: FormData): Promise<void> => {
+  const onSubmit = async (data: ChatInputFormData): Promise<void> => {
     setIsSubmitting(true);
     try {
       // Save user message to database first
