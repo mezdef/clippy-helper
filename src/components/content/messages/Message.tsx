@@ -1,6 +1,7 @@
 'use client';
 import React, { JSX } from 'react';
 import { Bot, User, RotateCcw } from 'lucide-react';
+import { ExcerptsList } from '../excerpts/ExcerptList';
 
 interface MessageProps {
   role: 'user' | 'assistant';
@@ -68,23 +69,7 @@ export const Message: React.FC<MessageProps> = ({
 
           {/* Display excerpts from database */}
           {!isUser && excerpts.length > 0 && (
-            <div className={`border-l-4 ${borderColor} pl-4`}>
-              <ul className="space-y-2">
-                {excerpts.map(excerpt => (
-                  <li
-                    key={excerpt.id}
-                    className="border-l-2 border-blue-300 pl-3"
-                  >
-                    <h5 className="font-medium text-blue-700 dark:text-blue-300">
-                      {excerpt.title}
-                    </h5>
-                    <p className="text-sm whitespace-pre-line">
-                      {excerpt.content}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ExcerptsList excerpts={excerpts} borderColor={borderColor} />
           )}
         </div>
       </div>
