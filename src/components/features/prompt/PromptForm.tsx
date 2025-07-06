@@ -6,18 +6,18 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { Button } from '@/components/ui';
 import { useMessageInput } from '@/hooks/useMessageInput';
 
-interface ChatInputFormProps {
+interface PromptFormProps {
   conversationId: string;
   onFocus?: () => void;
 }
 
-export interface ChatInputFormRef {
+export interface PromptFormRef {
   setValue: (value: string) => void;
   focus: () => void;
   isSubmitting: boolean;
 }
 
-export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
+export const PromptForm = forwardRef<PromptFormRef, PromptFormProps>(
   ({ conversationId, onFocus }, ref): JSX.Element => {
     const { methods, onSubmit, isSubmitting } = useMessageInput({
       conversationId,
@@ -26,11 +26,11 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       setValue: (value: string) => {
-        methods.setValue('chatInput', value);
+        methods.setValue('prompt', value);
       },
       focus: () => {
         // Focus the input field
-        const input = document.getElementById('chatInput') as HTMLInputElement;
+        const input = document.getElementById('prompt') as HTMLInputElement;
         if (input) {
           input.focus();
         }
@@ -38,7 +38,7 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
       isSubmitting,
     }));
 
-    const handleSubmit = async (data: { chatInput: string }) => {
+    const handleSubmit = async (data: { prompt: string }) => {
       try {
         await onSubmit(data);
       } catch (error) {
@@ -56,7 +56,7 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
           >
             <div className="flex-1">
               <Input
-                id="chatInput"
+                id="prompt"
                 placeholder="I'd like to write a letter..."
                 className="rounded-r-none h-12 text-lg"
                 onFocus={onFocus}
@@ -79,4 +79,4 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
   }
 );
 
-ChatInputForm.displayName = 'ChatInputForm';
+PromptForm.displayName = 'PromptForm';

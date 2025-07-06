@@ -2,8 +2,8 @@
 export type MessageRole = 'user' | 'assistant' | 'system';
 
 // Form data types
-export interface ChatInputFormData {
-  chatInput: string;
+export interface PromptFormData {
+  prompt: string;
 }
 
 export interface EditMessageFormData {

@@ -2,7 +2,8 @@
 import React, { JSX } from 'react';
 import { useParams } from 'next/navigation';
 import { useConversation } from '@/hooks/useConversations';
-import { MessageList, ChatInputForm } from '@/components/features/messages';
+import { MessageList } from '@/components/features/messages';
+import { PromptForm } from '@/components/features/prompt';
 import { useMessageInput } from '@/hooks/useMessageInput';
 import { useAppState } from '@/hooks/useAppState';
 import { LoadingPage } from '@/components/ui/loading';
@@ -21,7 +22,7 @@ export default function ConversationPage(): JSX.Element {
     messagesError,
   } = useConversation(conversationId);
 
-  const { handleEditMessage, chatInputRef } = useMessageInput({
+  const { handleEditMessage, promptFormRef } = useMessageInput({
     conversationId,
   });
 
@@ -64,8 +65,8 @@ export default function ConversationPage(): JSX.Element {
         editingItem={editingItem}
         setEditingItem={setEditingItem}
       />
-      <ChatInputForm
-        ref={chatInputRef}
+      <PromptForm
+        ref={promptFormRef}
         conversationId={conversationId}
         onFocus={() => clearEditingItem()}
       />

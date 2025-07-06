@@ -4,35 +4,35 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
 import { useAppState } from './useAppState';
-import type { ChatInputFormRef } from '@/components/features/messages';
+import type { PromptFormRef } from '@/components/features/prompt';
 import type { FormattedMessage } from '@/services/message.service';
-import type { ChatInputFormData } from '@/types';
+import type { PromptFormData } from '@/types';
 
 interface UseMessageInputProps {
   conversationId: string;
 }
 
 interface UseMessageInputReturn {
-  methods: ReturnType<typeof useForm<ChatInputFormData>>;
-  onSubmit: (data: ChatInputFormData) => Promise<void>;
+  methods: ReturnType<typeof useForm<PromptFormData>>;
+  onSubmit: (data: PromptFormData) => Promise<void>;
   handleEditMessage: (text: string, messageId: string) => Promise<void>;
-  chatInputRef: React.RefObject<ChatInputFormRef | null>;
+  promptFormRef: React.RefObject<PromptFormRef | null>;
   isSubmitting: boolean;
 }
 
 export const useMessageInput = ({
   conversationId,
 }: UseMessageInputProps): UseMessageInputReturn => {
-  const methods = useForm<ChatInputFormData>({
+  const methods = useForm<PromptFormData>({
     defaultValues: {
-      chatInput: '',
+      prompt: '',
     },
   });
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
   const deleteMessageMutation = useDeleteMessage();
   const { setIsSubmitting, setIsEditingMessage, isSubmitting } = useAppState();
-  const chatInputRef = useRef<ChatInputFormRef | null>(null);
+  const promptFormRef = useRef<PromptFormRef | null>(null);
 
   const sendChatRequest = async (
     aiRequests: AiRequestInput[]
@@ -127,7 +127,7 @@ export const useMessageInput = ({
     }
   };
 
-  const onSubmit = async (data: ChatInputFormData): Promise<void> => {
+  const onSubmit = async (data: PromptFormData): Promise<void> => {
     setIsSubmitting(true);
     try {
       // Save user message to database first
@@ -135,7 +135,7 @@ export const useMessageInput = ({
         conversationId,
         messageData: {
           role: 'user',
-          content: data.chatInput,
+          content: data.prompt,
         },
       });
 
@@ -154,7 +154,7 @@ export const useMessageInput = ({
         ...userMessages,
         {
           role: 'user',
-          content: data.chatInput,
+          content: data.prompt,
         },
       ];
 
@@ -183,7 +183,7 @@ export const useMessageInput = ({
     methods,
     onSubmit,
     handleEditMessage,
-    chatInputRef,
+    promptFormRef,
     isSubmitting,
   };
 };
