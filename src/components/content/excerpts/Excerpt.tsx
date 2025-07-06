@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export interface Excerpt {
   id: string;
@@ -17,7 +18,9 @@ export const Excerpt: React.FC<ExcerptProps> = ({ excerpt }) => {
       <h5 className="font-medium text-blue-700 dark:text-blue-300">
         {excerpt.title}
       </h5>
-      <p className="text-sm whitespace-pre-line">{excerpt.content}</p>
+      <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+        <ReactMarkdown>{excerpt.content}</ReactMarkdown>
+      </div>
     </li>
   );
 };
