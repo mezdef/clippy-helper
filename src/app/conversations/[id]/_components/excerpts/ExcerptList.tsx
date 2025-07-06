@@ -21,15 +21,11 @@ export const ExcerptsList: React.FC<ExcerptsListProps> = ({
     <div className="space-y-4">
       {excerpts.map(excerpt => (
         <div key={excerpt.id} className="flex gap-4">
-          <div
-            className={`bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4 flex-1`}
-          >
-            <Excerpt
-              excerpt={excerpt}
-              onEdit={onEditExcerpt}
-              onDelete={onDeleteExcerpt}
-            />
-          </div>
+          <Excerpt
+            excerpt={excerpt}
+            onEdit={onEditExcerpt}
+            onDelete={onDeleteExcerpt}
+          />
         </div>
       ))}
     </div>

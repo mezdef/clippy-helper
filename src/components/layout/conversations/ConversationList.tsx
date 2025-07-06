@@ -3,6 +3,7 @@ import React, { JSX, forwardRef } from 'react';
 import { Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/components/ui';
 import {
   useConversations,
   useCreateConversation,
@@ -121,18 +122,16 @@ export const ConversationList = forwardRef<
       <div ref={ref} className={className}>
         {showNewButton && (
           <div className="flex items-center justify-between mb-4">
-            <button
+            <Button
               onClick={handleNewConversation}
               disabled={createConversationMutation.isPending}
-              className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              icon={createConversationMutation.isPending ? undefined : Plus}
+              variant="ghost"
+              size="md"
+              loading={createConversationMutation.isPending}
             >
-              {createConversationMutation.isPending ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                <Plus className="h-4 w-4 mr-2" />
-              )}
               New Conversation
-            </button>
+            </Button>
           </div>
         )}
         {createConversationMutation.error && (

@@ -2,6 +2,7 @@
 import React, { JSX } from 'react';
 import { MessageSquare, Trash2 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/components/ui';
 import type { Conversation } from '@/db/schema';
 
 interface ConversationItemProps {
@@ -28,9 +29,10 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       }`}
     >
       <div className="flex items-center flex-1">
-        <button
+        <Button
           onClick={() => onConversationClick(conversation.id)}
-          className="flex items-center flex-1 text-left cursor-pointer"
+          variant="ghost"
+          className="flex items-center flex-1 text-left justify-start h-auto p-0"
         >
           <MessageSquare
             className={`h-4 w-4 mr-2 flex-shrink-0 ${
@@ -55,24 +57,23 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
               {new Date(conversation.updatedAt).toLocaleDateString()}
             </p>
           </div>
-        </button>
+        </Button>
       </div>
-      <button
+      <Button
         onClick={() => onDeleteConversation(conversation.id)}
         disabled={isDeleting}
-        className={`p-1 transition-colors cursor-pointer disabled:opacity-50 ${
+        icon={isDeleting ? undefined : Trash2}
+        variant="ghost"
+        size="sm"
+        className={`${
           isActive
             ? 'text-blue-400 hover:text-red-500'
             : 'text-gray-400 hover:text-red-500'
         }`}
         title="Delete conversation"
       >
-        {isDeleting ? (
-          <LoadingSpinner size="sm" />
-        ) : (
-          <Trash2 className="h-4 w-4" />
-        )}
-      </button>
+        {isDeleting && <LoadingSpinner size="sm" />}
+      </Button>
     </div>
   );
 };

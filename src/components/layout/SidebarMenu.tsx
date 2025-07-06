@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { MessagesSquare, X } from 'lucide-react';
 import { useSidebar } from '@/hooks/useSidebar';
+import { Button } from '@/components/ui';
 
 interface SidebarMenuProps {
   children: ReactNode;
@@ -67,14 +68,15 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
 
     return (
       <>
-        <button
+        <Button
           onClick={toggleSidebar}
           disabled={isLoading}
-          className="fixed top-4 left-4 z-40 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          icon={MessagesSquare}
+          variant="outline"
+          size="md"
+          className="fixed top-4 left-4 z-40"
           title={triggerButtonTitle}
-        >
-          <MessagesSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        </button>
+        />
 
         {isOpen && (
           <div
@@ -93,14 +95,14 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {title}
               </h2>
-              <button
+              <Button
                 onClick={handleClose}
                 disabled={isLoading}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer disabled:opacity-50"
+                icon={X}
+                variant="ghost"
+                size="sm"
                 title={closeButtonTitle}
-              >
-                <X className="h-5 w-5" />
-              </button>
+              />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">{children}</div>

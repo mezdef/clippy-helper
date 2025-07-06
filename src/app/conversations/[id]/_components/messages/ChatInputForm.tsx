@@ -3,6 +3,7 @@ import React, { JSX, useState, forwardRef, useImperativeHandle } from 'react';
 import { Form, FormField, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/components/ui';
 import { useMessageInput } from '@/hooks/useMessageInput';
 
 interface ChatInputFormProps {
@@ -60,18 +61,15 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
                 />
               </FormField>
             </div>
-            <button
+            <Button
               type="submit"
-              className="bg-blue-600 text-white rounded p-3 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+              icon={isSubmitting ? undefined : Sparkles}
+              variant="default"
+              size="lg"
               disabled={isSubmitting}
+              loading={isSubmitting}
               aria-label="Send"
-            >
-              {isSubmitting ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                <Sparkles className="h-5 w-5" />
-              )}
-            </button>
+            />
           </Form>
         </div>
       </div>

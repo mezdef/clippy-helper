@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Save, X } from 'lucide-react';
 import { Form, FormField, Input, Textarea } from '@/components/ui/forms';
+import { Button } from '@/components/ui';
 
 interface EditExcerptFormData {
   title: string;
@@ -54,21 +55,24 @@ export const EditExcerptForm: React.FC<EditExcerptFormProps> = ({
           />
         </FormField>
         <div className="flex gap-2">
-          <button
+          <Button
             type="submit"
-            className="flex items-center gap-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            icon={Save}
+            size="sm"
+            variant="default"
+            className="bg-green-600 hover:bg-green-700"
           >
-            <Save className="h-3 w-3" />
             Save
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={onCancel}
-            className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            icon={X}
+            size="sm"
+            variant="secondary"
           >
-            <X className="h-3 w-3" />
             Cancel
-          </button>
+          </Button>
         </div>
       </Form>
     </div>

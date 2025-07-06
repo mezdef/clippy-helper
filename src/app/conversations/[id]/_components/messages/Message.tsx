@@ -1,8 +1,8 @@
 'use client';
 import React, { JSX, useState } from 'react';
-import { User, Edit2 } from 'lucide-react';
+import { Edit2, X } from 'lucide-react';
 import { ExcerptsList } from '../excerpts/ExcerptList';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar, Button } from '@/components/ui';
 import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
 import { EditMessageForm } from './EditMessageForm';
 
@@ -105,14 +105,15 @@ export const Message: React.FC<MessageProps> = ({
       {isUser && (
         <div className="flex flex-col items-center gap-2">
           <Avatar role={role} />
-          {onEditMessage && text && !isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs cursor-pointer flex items-center justify-center transition-colors"
-              title="Edit this message"
-            >
-              <Edit2 className="h-3 w-3" />
-            </button>
+          {onEditMessage && text && (
+            <Button
+              onClick={isEditing ? handleEditCancel : () => setIsEditing(true)}
+              icon={isEditing ? X : Edit2}
+              size="sm"
+              variant="ghost"
+              title={isEditing ? 'Cancel editing' : 'Edit this message'}
+              className="p-1.5"
+            />
           )}
         </div>
       )}
