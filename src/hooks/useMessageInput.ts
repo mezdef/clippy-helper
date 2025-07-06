@@ -17,6 +17,7 @@ interface UseMessageInputReturn {
   onSubmit: (data: ChatInputFormData) => Promise<void>;
   handleEditMessage: (text: string, messageId: string) => Promise<void>;
   chatInputRef: React.RefObject<ChatInputFormRef | null>;
+  isSubmitting: boolean;
 }
 
 export const useMessageInput = ({
@@ -30,7 +31,7 @@ export const useMessageInput = ({
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
   const deleteMessageMutation = useDeleteMessage();
-  const { setIsSubmitting, setIsEditingMessage } = useAppState();
+  const { setIsSubmitting, setIsEditingMessage, isSubmitting } = useAppState();
   const chatInputRef = useRef<ChatInputFormRef | null>(null);
 
   const sendChatRequest = async (
@@ -183,5 +184,6 @@ export const useMessageInput = ({
     onSubmit,
     handleEditMessage,
     chatInputRef,
+    isSubmitting,
   };
 };

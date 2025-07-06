@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import type { EditingItem } from '@/types';
 
 // Global app state interface
@@ -27,33 +28,43 @@ export const useAppState = () => {
     gcTime: Infinity,
   });
 
-  // Mutation to update app state
-  const updateAppStateMutation = useMutation({
-    mutationFn: async (updates: Partial<AppState>) => {
-      const newState = { ...appState, ...updates };
-      return newState;
-    },
-    onSuccess: newState => {
+  // Convenience functions with immediate updates
+  const setEditingItem = useCallback(
+    (item: EditingItem | null) => {
+      const newState = { ...appState, editingItem: item };
       queryClient.setQueryData(['appState'], newState);
     },
-  });
+    [appState, queryClient]
+  );
 
-  // Convenience functions
-  const setEditingItem = (item: EditingItem | null) => {
-    updateAppStateMutation.mutate({ editingItem: item });
-  };
+  const setIsSubmitting = useCallback(
+    (isSubmitting: boolean) => {
+      const newState = { ...appState, isSubmitting };
+      queryClient.setQueryData(['appState'], newState);
+    },
+    [appState, queryClient]
+  );
 
-  const setIsSubmitting = (isSubmitting: boolean) => {
-    updateAppStateMutation.mutate({ isSubmitting });
-  };
+  const setIsEditingMessage = useCallback(
+    (isEditingMessage: boolean) => {
+      const newState = { ...appState, isEditingMessage };
+      queryClient.setQueryData(['appState'], newState);
+    },
+    [appState, queryClient]
+  );
 
-  const setIsEditingMessage = (isEditingMessage: boolean) => {
-    updateAppStateMutation.mutate({ isEditingMessage });
-  };
+  const clearEditingItem = useCallback(() => {
+    const newState = { ...appState, editingItem: null };
+    queryClient.setQueryData(['appState'], newState);
+  }, [appState, queryClient]);
 
-  const clearEditingItem = () => {
-    updateAppStateMutation.mutate({ editingItem: null });
-  };
+  const updateAppState = useCallback(
+    (updates: Partial<AppState>) => {
+      const newState = { ...appState, ...updates };
+      queryClient.setQueryData(['appState'], newState);
+    },
+    [appState, queryClient]
+  );
 
   return {
     // State
@@ -66,9 +77,9 @@ export const useAppState = () => {
     setIsSubmitting,
     setIsEditingMessage,
     clearEditingItem,
-    updateAppState: updateAppStateMutation.mutate,
+    updateAppState,
 
-    // Meta
-    isUpdating: updateAppStateMutation.isPending,
+    // Meta (for compatibility)
+    isUpdating: false,
   };
 };
