@@ -4,7 +4,7 @@ import { Form, FormField, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { Button } from '@/components/ui';
-import { useMessageInput } from '@/hooks/useMessageInput';
+import { usePrompt } from '@/hooks/usePrompt';
 
 interface PromptFormProps {
   conversationId: string;
@@ -19,7 +19,7 @@ export interface PromptFormRef {
 
 export const PromptForm = forwardRef<PromptFormRef, PromptFormProps>(
   ({ conversationId, onFocus }, ref): JSX.Element => {
-    const { methods, onSubmit, isSubmitting } = useMessageInput({
+    const { methods, onSubmit, isSubmitting } = usePrompt({
       conversationId,
     });
 

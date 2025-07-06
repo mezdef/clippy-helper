@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useConversation } from '@/hooks/useConversations';
 import { MessageList } from '@/components/features/messages';
 import { PromptForm } from '@/components/features/prompt';
-import { useMessageInput } from '@/hooks/useMessageInput';
+import { usePrompt } from '@/hooks/usePrompt';
 import { useAppState } from '@/hooks/useAppState';
 import { LoadingPage } from '@/components/ui/loading';
 import { formatDate } from '@/utils/date';
@@ -22,7 +22,7 @@ export default function ConversationPage(): JSX.Element {
     messagesError,
   } = useConversation(conversationId);
 
-  const { handleEditMessage, promptFormRef } = useMessageInput({
+  const { handleEditMessage, promptFormRef } = usePrompt({
     conversationId,
   });
 

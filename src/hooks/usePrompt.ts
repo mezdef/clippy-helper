@@ -8,11 +8,11 @@ import type { FormattedMessage } from '@/services/message.service';
 import type { PromptFormData } from '@/types';
 import type { AiRequestInput } from '@/services/llm.service';
 
-interface UseMessageInputProps {
+interface UsePromptProps {
   conversationId: string;
 }
 
-interface UseMessageInputReturn {
+interface UsePromptReturn {
   methods: ReturnType<typeof useForm<PromptFormData>>;
   onSubmit: (data: PromptFormData) => Promise<void>;
   handleEditMessage: (text: string, messageId: string) => Promise<void>;
@@ -20,9 +20,9 @@ interface UseMessageInputReturn {
   isSubmitting: boolean;
 }
 
-export const useMessageInput = ({
+export const usePrompt = ({
   conversationId,
-}: UseMessageInputProps): UseMessageInputReturn => {
+}: UsePromptProps): UsePromptReturn => {
   const methods = useForm<PromptFormData>({
     defaultValues: {
       prompt: '',
@@ -69,7 +69,7 @@ export const useMessageInput = ({
   /**
    * Send request to LLM API
    */
-  const sendChatRequest = async (
+  const sendPromptRequest = async (
     aiRequests: AiRequestInput[]
   ): Promise<any> => {
     try {
@@ -86,7 +86,7 @@ export const useMessageInput = ({
 
       return result;
     } catch (error) {
-      console.error('Error sending LLM request:', error);
+      console.error('Error sending prompt request:', error);
       throw error;
     }
   };
@@ -142,7 +142,7 @@ export const useMessageInput = ({
       );
 
       // Get AI response
-      const result = await sendChatRequest(newAiRequests);
+      const result = await sendPromptRequest(newAiRequests);
 
       // Save AI message to database with excerpts
       await createMessageMutation.mutateAsync({
@@ -187,7 +187,7 @@ export const useMessageInput = ({
       );
 
       // Get AI response
-      const result = await sendChatRequest(newAiRequests);
+      const result = await sendPromptRequest(newAiRequests);
 
       // Save AI message to database with excerpts
       await createMessageMutation.mutateAsync({
@@ -199,7 +199,7 @@ export const useMessageInput = ({
         },
       });
     } catch (err) {
-      console.error('Error in chat submission:', err);
+      console.error('Error in prompt submission:', err);
       throw err;
     } finally {
       setIsSubmitting(false);
