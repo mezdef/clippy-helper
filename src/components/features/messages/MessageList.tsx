@@ -2,7 +2,7 @@
 import React, { JSX, useRef, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
-import { TypingIndicator } from './TypingIndicator';
+import { TypingIndicator } from '@/components/ui/TypingIndicator';
 import { MessageListTitle } from './MessageListTitle';
 import type { EditingItem } from '@/types';
 

@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
 import { useAppState } from './useAppState';
-import type { ChatInputFormRef } from '@/app/conversations/[id]/_components/messages';
+import type { ChatInputFormRef } from '@/components/features/messages';
 import type { FormattedMessage } from '@/services/message.service';
 import type { ChatInputFormData } from '@/types';
 

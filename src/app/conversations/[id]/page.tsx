@@ -2,7 +2,7 @@
 import React, { JSX } from 'react';
 import { useParams } from 'next/navigation';
 import { useConversation } from '@/hooks/useConversations';
-import { MessageList, ChatInputForm } from './_components/messages';
+import { MessageList, ChatInputForm } from '@/components/features/messages';
 import { useMessageInput } from '@/hooks/useMessageInput';
 import { useAppState } from '@/hooks/useAppState';
 import { LoadingPage } from '@/components/ui/loading';
