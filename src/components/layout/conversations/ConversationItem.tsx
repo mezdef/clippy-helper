@@ -28,36 +28,33 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
           : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
       }`}
     >
-      <div className="flex items-center flex-1">
-        <Button
-          onClick={() => onConversationClick(conversation.id)}
-          variant="ghost"
-          className="flex items-center flex-1 text-left justify-start h-auto p-0"
-        >
-          <MessageSquare
-            className={`h-4 w-4 mr-2 flex-shrink-0 ${
-              isActive ? 'text-blue-600 dark:text-blue-400' : ''
+      <div
+        className="flex items-center flex-1 cursor-pointer"
+        onClick={() => onConversationClick(conversation.id)}
+      >
+        <MessageSquare
+          className={`h-4 w-4 mr-2 flex-shrink-0 ${
+            isActive ? 'text-blue-600 dark:text-blue-400' : ''
+          }`}
+        />
+        <div className="min-w-0 flex-1">
+          <p
+            className={`text-sm font-medium truncate ${
+              isActive ? 'text-blue-900 dark:text-blue-100' : ''
             }`}
-          />
-          <div className="min-w-0 flex-1">
-            <p
-              className={`text-sm font-medium truncate ${
-                isActive ? 'text-blue-900 dark:text-blue-100' : ''
-              }`}
-            >
-              {conversation.title}
-            </p>
-            <p
-              className={`text-xs ${
-                isActive
-                  ? 'text-blue-600 dark:text-blue-300'
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              {new Date(conversation.updatedAt).toLocaleDateString()}
-            </p>
-          </div>
-        </Button>
+          >
+            {conversation.title}
+          </p>
+          <p
+            className={`text-xs ${
+              isActive
+                ? 'text-blue-600 dark:text-blue-300'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            {new Date(conversation.updatedAt).toLocaleDateString()}
+          </p>
+        </div>
       </div>
       <Button
         onClick={() => onDeleteConversation(conversation.id)}

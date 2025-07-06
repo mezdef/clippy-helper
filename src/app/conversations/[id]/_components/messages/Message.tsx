@@ -68,11 +68,11 @@ export const Message: React.FC<MessageProps> = ({
 
   return (
     <div className={`flex gap-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      {!isUser && <Avatar role={role} />}
+      <div className="w-8 flex-shrink-0">
+        {!isUser && <Avatar role={role} />}
+      </div>
 
-      <div
-        className={`${isEditing ? 'w-full' : 'max-w-3xl'} ${bgColor} ${padding} rounded-lg`}
-      >
+      <div className={`w-full ${bgColor} ${padding} rounded-lg`}>
         <div className="space-y-3">
           {/* Display text content or edit form */}
           {isUser && text && (
@@ -85,7 +85,9 @@ export const Message: React.FC<MessageProps> = ({
                 />
               ) : (
                 <div className="space-y-2">
-                  <p className="whitespace-pre-line text-sm">{text}</p>
+                  <p className="whitespace-pre-line text-sm text-right">
+                    {text}
+                  </p>
                 </div>
               )}
             </>

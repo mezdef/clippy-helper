@@ -51,15 +51,14 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
           <Form
             onSubmit={handleSubmit}
             methods={methods}
-            className="flex flex-row gap-2 w-full items-end"
+            className="flex flex-row w-full items-end"
           >
             <div className="flex-1">
-              <FormField label="Ask Clippy for something...">
-                <Input
-                  id="chatInput"
-                  placeholder="I'd like to write a letter..."
-                />
-              </FormField>
+              <Input
+                id="chatInput"
+                placeholder="I'd like to write a letter..."
+                className="rounded-r-none h-12 text-lg"
+              />
             </div>
             <Button
               type="submit"
@@ -69,6 +68,7 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
               disabled={isSubmitting}
               loading={isSubmitting}
               aria-label="Send"
+              className="rounded-l-none h-12 w-12 p-0"
             />
           </Form>
         </div>
