@@ -12,12 +12,12 @@ interface ExcerptsListProps {
     type: 'message' | 'excerpt';
     id: string;
   } | null;
-  setEditingItem?: React.Dispatch<
-    React.SetStateAction<{
+  setEditingItem?: (
+    item: {
       type: 'message' | 'excerpt';
       id: string;
-    } | null>
-  >;
+    } | null
+  ) => void;
 }
 
 export const ExcerptsList: React.FC<ExcerptsListProps> = ({

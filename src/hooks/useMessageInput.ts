@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
+import { useAppState } from './useAppState';
 import type { ChatInputFormRef } from '@/app/conversations/[id]/_components/messages';
 import type { FormattedMessage } from '@/services/message.service';
 import type { ChatInputFormData } from '@/types';
@@ -14,8 +15,6 @@ interface UseMessageInputProps {
 interface UseMessageInputReturn {
   methods: ReturnType<typeof useForm<ChatInputFormData>>;
   onSubmit: (data: ChatInputFormData) => Promise<void>;
-  isSubmitting: boolean;
-  isEditingMessage: boolean;
   handleEditMessage: (text: string, messageId: string) => Promise<void>;
   chatInputRef: React.RefObject<ChatInputFormRef | null>;
 }
@@ -31,8 +30,7 @@ export const useMessageInput = ({
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
   const deleteMessageMutation = useDeleteMessage();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditingMessage, setIsEditingMessage] = useState(false);
+  const { setIsSubmitting, setIsEditingMessage } = useAppState();
   const chatInputRef = useRef<ChatInputFormRef | null>(null);
 
   const sendChatRequest = async (
@@ -183,8 +181,6 @@ export const useMessageInput = ({
   return {
     methods,
     onSubmit,
-    isSubmitting,
-    isEditingMessage,
     handleEditMessage,
     chatInputRef,
   };

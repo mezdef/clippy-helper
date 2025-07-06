@@ -1,8 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAppState } from './useAppState';
+import type { FormattedMessage } from '@/services/message.service';
 
 // Update an excerpt
 export const useUpdateExcerpt = () => {
   const queryClient = useQueryClient();
+  const { clearEditingItem } = useAppState();
 
   return useMutation({
     mutationFn: async ({
@@ -27,8 +30,26 @@ export const useUpdateExcerpt = () => {
       return response.json();
     },
     onSuccess: updatedExcerpt => {
-      // Invalidate and refetch messages to update the UI
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      // Clear editing state
+      clearEditingItem();
+
+      // Update the excerpt in the messages cache optimistically
+      queryClient.setQueriesData(
+        { queryKey: ['messages'] },
+        (oldData: FormattedMessage[] | undefined) => {
+          if (!oldData) return oldData;
+
+          return oldData.map(message => ({
+            ...message,
+            excerpts:
+              message.excerpts?.map(excerpt =>
+                excerpt.id === updatedExcerpt.id
+                  ? { ...excerpt, ...updatedExcerpt }
+                  : excerpt
+              ) || [],
+          }));
+        }
+      );
     },
   });
 };
@@ -36,6 +57,7 @@ export const useUpdateExcerpt = () => {
 // Delete an excerpt
 export const useDeleteExcerpt = () => {
   const queryClient = useQueryClient();
+  const { clearEditingItem } = useAppState();
 
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
@@ -47,9 +69,24 @@ export const useDeleteExcerpt = () => {
         throw new Error('Failed to delete excerpt');
       }
     },
-    onSuccess: () => {
-      // Invalidate and refetch messages to update the UI
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+    onSuccess: (_, deletedId) => {
+      // Clear editing state
+      clearEditingItem();
+
+      // Remove the excerpt from the messages cache optimistically
+      queryClient.setQueriesData(
+        { queryKey: ['messages'] },
+        (oldData: FormattedMessage[] | undefined) => {
+          if (!oldData) return oldData;
+
+          return oldData.map(message => ({
+            ...message,
+            excerpts:
+              message.excerpts?.filter(excerpt => excerpt.id !== deletedId) ||
+              [],
+          }));
+        }
+      );
     },
   });
 };

@@ -1,10 +1,11 @@
 'use client';
-import React, { JSX, useState, forwardRef, useImperativeHandle } from 'react';
+import React, { JSX, forwardRef, useImperativeHandle } from 'react';
 import { Form, FormField, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { Button } from '@/components/ui';
 import { useMessageInput } from '@/hooks/useMessageInput';
+import { useAppState } from '@/hooks/useAppState';
 
 interface ChatInputFormProps {
   conversationId: string;
@@ -19,9 +20,10 @@ export interface ChatInputFormRef {
 
 export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
   ({ conversationId, onFocus }, ref): JSX.Element => {
-    const { methods, onSubmit, isSubmitting } = useMessageInput({
+    const { methods, onSubmit } = useMessageInput({
       conversationId,
     });
+    const { isSubmitting } = useAppState();
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({

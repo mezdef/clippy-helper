@@ -19,7 +19,7 @@ export interface EditingItem {
 // Common props for components that handle editing state
 export interface EditingStateProps {
   editingItem?: EditingItem | null;
-  setEditingItem?: React.Dispatch<React.SetStateAction<EditingItem | null>>;
+  setEditingItem?: (item: EditingItem | null) => void;
 }
 
 // Loading states for UI components
