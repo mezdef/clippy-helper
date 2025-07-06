@@ -1,28 +1,37 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { AiRequestInput } from '@/api/chat/route';
-import { useCreateMessage } from './useMessages';
 import { useQueryClient } from '@tanstack/react-query';
+import { AiRequestInput } from '@/api/chat/route';
+import { useCreateMessage, useDeleteMessage } from './useMessages';
+import type { ChatInputFormRef } from '@/components/content/messages';
+import type { FormattedMessage } from '@/services/message.service';
 
 type FormData = { chatInput: string };
 
-interface UseChatInputProps {
+interface UseMessageInputProps {
   conversationId: string;
 }
 
-interface UseChatInputReturn {
+interface UseMessageInputReturn {
   methods: ReturnType<typeof useForm<FormData>>;
   onSubmit: (data: FormData) => Promise<void>;
   isSubmitting: boolean;
+  reAskedMessageId: string | null;
+  handleReAsk: (text: string, messageId: string) => void;
+  handleMessageSubmitted: () => Promise<void>;
+  chatInputRef: React.RefObject<ChatInputFormRef | null>;
 }
 
-export const useChatInput = ({
+export const useMessageInput = ({
   conversationId,
-}: UseChatInputProps): UseChatInputReturn => {
+}: UseMessageInputProps): UseMessageInputReturn => {
   const methods = useForm<FormData>();
   const queryClient = useQueryClient();
   const createMessageMutation = useCreateMessage();
+  const deleteMessageMutation = useDeleteMessage();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reAskedMessageId, setReAskedMessageId] = useState<string | null>(null);
+  const chatInputRef = useRef<ChatInputFormRef | null>(null);
 
   const sendChatRequest = async (
     aiRequests: AiRequestInput[]
@@ -41,9 +50,49 @@ export const useChatInput = ({
     return result;
   };
 
+  const handleReAsk = (text: string, messageId: string) => {
+    chatInputRef.current?.setValue(text);
+    chatInputRef.current?.focus();
+    setReAskedMessageId(messageId);
+  };
+
+  const handleMessageSubmitted = async () => {
+    if (reAskedMessageId) {
+      const currentMessages =
+        (queryClient.getQueryData([
+          'messages',
+          conversationId,
+        ]) as FormattedMessage[]) || [];
+
+      const messageIndex = currentMessages.findIndex(
+        msg => msg.id === reAskedMessageId
+      );
+
+      if (messageIndex !== -1) {
+        const messagesToDelete = currentMessages.slice(messageIndex);
+
+        try {
+          for (const message of messagesToDelete) {
+            await deleteMessageMutation.mutateAsync({
+              conversationId,
+              messageId: message.id,
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting messages:', error);
+        }
+      }
+
+      setReAskedMessageId(null);
+    }
+  };
+
   const onSubmit = async (data: FormData): Promise<void> => {
     setIsSubmitting(true);
     try {
+      // Handle re-ask cleanup if needed
+      await handleMessageSubmitted();
+
       // Save user message to database first
       await createMessageMutation.mutateAsync({
         conversationId,
@@ -60,7 +109,7 @@ export const useChatInput = ({
         .filter((msg: any) => msg.role === 'user')
         .map((msg: any) => ({
           role: msg.role as 'user' | 'assistant' | 'system',
-          content: msg.content,
+          content: msg.text || msg.content || '',
         }));
 
       // Add the new user message to the context
@@ -97,5 +146,9 @@ export const useChatInput = ({
     methods,
     onSubmit,
     isSubmitting,
+    reAskedMessageId,
+    handleReAsk,
+    handleMessageSubmitted,
+    chatInputRef,
   };
 };

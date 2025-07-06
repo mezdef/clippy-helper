@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Message, MessageWithExcerpts } from '@/db/schema';
+import type { FormattedMessage } from '@/services/message.service';
 
-// Fetch messages for a conversation
+// Fetch messages for a conversation (returns formatted messages for UI)
 export const useMessages = (conversationId: string) => {
   return useQuery({
     queryKey: ['messages', conversationId],
-    queryFn: async (): Promise<MessageWithExcerpts[]> => {
+    queryFn: async (): Promise<FormattedMessage[]> => {
       const response = await fetch(
         `/api/conversations/${conversationId}/messages`
       );
@@ -49,8 +50,16 @@ export const useCreateMessage = () => {
       // Add the new message to the messages cache
       queryClient.setQueryData(
         ['messages', conversationId],
-        (old: MessageWithExcerpts[] | undefined) =>
-          old ? [...old, newMessage] : [newMessage]
+        (old: FormattedMessage[] | undefined) => {
+          // Format the new message to match the cache structure
+          const formattedMessage: FormattedMessage = {
+            id: newMessage.id,
+            role: newMessage.role as 'user' | 'assistant',
+            text: newMessage.content,
+            excerpts: newMessage.excerpts || [],
+          };
+          return old ? [...old, formattedMessage] : [formattedMessage];
+        }
       );
 
       // Invalidate the conversation to refresh the messages count
@@ -88,7 +97,8 @@ export const useDeleteMessage = () => {
       // Remove the message from the messages cache
       queryClient.setQueryData(
         ['messages', conversationId],
-        (old: Message[] | undefined) => old?.filter(msg => msg.id !== messageId)
+        (old: FormattedMessage[] | undefined) =>
+          old?.filter(msg => msg.id !== messageId)
       );
 
       // Invalidate the conversation to refresh the messages count
@@ -132,8 +142,21 @@ export const useUpdateMessage = () => {
       // Update the message in the messages cache
       queryClient.setQueryData(
         ['messages', conversationId],
-        (old: Message[] | undefined) =>
-          old?.map(msg => (msg.id === updatedMessage.id ? updatedMessage : msg))
+        (old: FormattedMessage[] | undefined) =>
+          old?.map(msg => {
+            if (msg.id === updatedMessage.id) {
+              // Format the updated message to match the cache structure
+              // Keep existing excerpts since update doesn't return them
+              const formattedMessage: FormattedMessage = {
+                id: updatedMessage.id,
+                role: updatedMessage.role as 'user' | 'assistant',
+                text: updatedMessage.content,
+                excerpts: msg.excerpts, // Keep existing excerpts
+              };
+              return formattedMessage;
+            }
+            return msg;
+          })
       );
 
       // Invalidate the conversation to refresh any derived data

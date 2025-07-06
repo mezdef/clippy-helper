@@ -8,7 +8,8 @@ export async function GET(
   try {
     const { id } = await params;
     const messages = await messageService.getByConversationId(id);
-    return NextResponse.json(messages);
+    const formattedMessages = messageService.formatMessagesForUI(messages);
+    return NextResponse.json(formattedMessages);
   } catch (error) {
     console.error('Error fetching messages:', error);
     return NextResponse.json(

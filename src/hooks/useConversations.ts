@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import type { Conversation } from '@/db/schema';
+import type { FormattedMessage } from '@/services/message.service';
 
 // Fetch all conversations
 export const useConversations = () => {
@@ -15,19 +17,60 @@ export const useConversations = () => {
   });
 };
 
-// Fetch a single conversation with messages
-export const useConversation = (id: string) => {
-  return useQuery({
-    queryKey: ['conversation', id],
+// Fetch a single conversation with messages and state management
+export const useConversation = (id?: string) => {
+  const params = useParams();
+  const conversationId = id || (params.id as string);
+
+  const conversationQuery = useQuery({
+    queryKey: ['conversation', conversationId],
     queryFn: async () => {
-      const response = await fetch(`/api/conversations/${id}`);
+      const response = await fetch(`/api/conversations/${conversationId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch conversation');
       }
       return response.json();
     },
-    enabled: !!id,
+    enabled: !!conversationId,
   });
+
+  const messagesQuery = useQuery({
+    queryKey: ['messages', conversationId],
+    queryFn: async (): Promise<FormattedMessage[]> => {
+      const response = await fetch(
+        `/api/conversations/${conversationId}/messages`
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      return response.json();
+    },
+    enabled: !!conversationId,
+  });
+
+  return {
+    // Data
+    conversation: conversationQuery.data,
+    messages: messagesQuery.data || [],
+
+    // Loading states
+    conversationLoading: conversationQuery.isLoading,
+    messagesLoading: messagesQuery.isLoading,
+    isLoading: conversationQuery.isLoading || messagesQuery.isLoading,
+
+    // Error states
+    conversationError: conversationQuery.error,
+    messagesError: messagesQuery.error,
+    hasError: !!conversationQuery.error || !!messagesQuery.error,
+
+    // Other
+    conversationId,
+    isError: conversationQuery.isError || messagesQuery.isError,
+    refetch: () => {
+      conversationQuery.refetch();
+      messagesQuery.refetch();
+    },
+  };
 };
 
 // Create a new conversation

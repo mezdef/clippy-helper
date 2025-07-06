@@ -10,6 +10,18 @@ import {
 import { eq } from 'drizzle-orm';
 import { excerptService } from './excerpt.service';
 
+export interface FormattedMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  excerpts: Array<{
+    id: string;
+    title: string;
+    content: string;
+    order: string;
+  }>;
+}
+
 export const messageService = {
   // Create a new message (optionally with excerpts for AI responses)
   async create(
@@ -67,6 +79,16 @@ export const messageService = {
     });
 
     return Array.from(messageMap.values());
+  },
+
+  // Format messages for UI consumption
+  formatMessagesForUI(messages: MessageWithExcerpts[]): FormattedMessage[] {
+    return messages.map(msg => ({
+      id: msg.id,
+      role: msg.role as 'user' | 'assistant',
+      text: msg.content,
+      excerpts: msg.excerpts,
+    }));
   },
 
   // Get a message by ID

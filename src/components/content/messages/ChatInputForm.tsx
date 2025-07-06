@@ -3,7 +3,7 @@ import React, { JSX, useState, forwardRef, useImperativeHandle } from 'react';
 import { Form, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
-import { useChatInput } from '@/hooks/useChatInput';
+import { useMessageInput } from '@/hooks/useMessageInput';
 
 interface ChatInputFormProps {
   conversationId: string;
@@ -18,7 +18,7 @@ export interface ChatInputFormRef {
 
 export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
   ({ conversationId, onMessageSubmitted }, ref): JSX.Element => {
-    const { methods, onSubmit, isSubmitting } = useChatInput({
+    const { methods, onSubmit, isSubmitting } = useMessageInput({
       conversationId,
     });
 
