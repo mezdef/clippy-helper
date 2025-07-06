@@ -26,21 +26,43 @@ export const messageService = {
     }
   ): Promise<MessageWithExcerpts> {
     const { aiResponse, ...messageData } = data;
-    const [message] = await db.insert(messages).values(messageData).returning();
 
-    // Save excerpts if this is an AI response with structured content
-    let messageExcerpts: Excerpt[] = [];
-    if (aiResponse && messageData.role === 'assistant') {
-      messageExcerpts = await excerptService.saveFromAiResponse(
-        message.id,
-        aiResponse
-      );
-    }
+    // Use transaction to ensure data consistency
+    return await db.transaction(async tx => {
+      // Create the message
+      const [message] = await tx
+        .insert(messages)
+        .values(messageData)
+        .returning();
 
-    return {
-      ...message,
-      excerpts: messageExcerpts,
-    };
+      // Save excerpts if this is an AI response with structured content
+      let messageExcerpts: Excerpt[] = [];
+      if (aiResponse && messageData.role === 'assistant') {
+        // Create excerpts within the same transaction
+        if (
+          aiResponse?.list &&
+          Array.isArray(aiResponse.list) &&
+          aiResponse.list.length > 0
+        ) {
+          const excerptData = aiResponse.list.map((item, index) => ({
+            messageId: message.id,
+            title: item.title,
+            content: item.content,
+            order: index.toString(),
+          }));
+
+          messageExcerpts = await tx
+            .insert(excerpts)
+            .values(excerptData)
+            .returning();
+        }
+      }
+
+      return {
+        ...message,
+        excerpts: messageExcerpts,
+      };
+    });
   },
 
   // Get messages for a conversation with excerpts
@@ -96,8 +118,9 @@ export const messageService = {
     return message;
   },
 
-  // Delete a message
+  // Delete a message (cascade deletes are handled by database constraints)
   async delete(id: string) {
+    // The database will automatically cascade delete all excerpts for this message
     await db.delete(messages).where(eq(messages.id, id));
   },
 

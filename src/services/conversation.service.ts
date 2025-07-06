@@ -94,8 +94,11 @@ export const conversationService = {
     return conversation;
   },
 
-  // Delete a conversation
+  // Delete a conversation (cascade deletes are handled by database constraints)
   async delete(id: string) {
+    // The database will automatically cascade delete:
+    // 1. All messages in this conversation (via conversations -> messages FK)
+    // 2. All excerpts from those messages (via messages -> excerpts FK)
     await db.delete(conversations).where(eq(conversations.id, id));
   },
 };
