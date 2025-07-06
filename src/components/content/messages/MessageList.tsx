@@ -3,6 +3,7 @@ import React, { JSX, useRef, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
 import { TypingIndicator } from './TypingIndicator';
+import { MessageListTitle } from './MessageListTitle';
 
 interface MessageType {
   role: 'user' | 'assistant';
@@ -56,18 +57,10 @@ export const MessageList: React.FC<MessageListProps> = ({
     >
       {/* Conversation Info */}
       {conversationTitle && (
-        <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-              {conversationTitle}
-            </h1>
-            {conversationCreatedAt && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Created {conversationCreatedAt}
-              </p>
-            )}
-          </div>
-        </div>
+        <MessageListTitle
+          title={conversationTitle}
+          createdAt={conversationCreatedAt}
+        />
       )}
 
       {messages.length === 0 ? (
