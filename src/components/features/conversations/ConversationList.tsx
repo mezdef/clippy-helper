@@ -22,7 +22,7 @@ interface ConversationListProps {
   sidebarRef?: React.RefObject<SidebarMenuRef>;
 }
 
-export const ConversationList = forwardRef<
+const ConversationListComponent = forwardRef<
   HTMLDivElement,
   ConversationListProps
 >(
@@ -159,4 +159,7 @@ export const ConversationList = forwardRef<
   }
 );
 
-ConversationList.displayName = 'ConversationList';
+ConversationListComponent.displayName = 'ConversationListComponent';
+
+// Memoize the component to prevent unnecessary re-renders
+export const ConversationList = React.memo(ConversationListComponent);

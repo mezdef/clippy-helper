@@ -8,7 +8,7 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+const LoadingSpinnerComponent: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
   text,
   className = '',
@@ -26,3 +26,6 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders for this frequently used component
+export const LoadingSpinner = React.memo(LoadingSpinnerComponent);

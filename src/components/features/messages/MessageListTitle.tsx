@@ -6,7 +6,7 @@ interface MessageListTitleProps {
   className?: string;
 }
 
-export const MessageListTitle: React.FC<MessageListTitleProps> = ({
+const MessageListTitleComponent: React.FC<MessageListTitleProps> = ({
   title,
   createdAt,
   className = '',
@@ -28,3 +28,6 @@ export const MessageListTitle: React.FC<MessageListTitleProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders when props haven't changed
+export const MessageListTitle = React.memo(MessageListTitleComponent);

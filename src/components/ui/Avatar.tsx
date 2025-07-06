@@ -8,7 +8,7 @@ interface AvatarProps {
   className?: string;
 }
 
-export const Avatar: React.FC<AvatarProps> = ({
+const AvatarComponent: React.FC<AvatarProps> = ({
   role,
   size = 'md',
   className = '',
@@ -44,3 +44,6 @@ export const Avatar: React.FC<AvatarProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders for this frequently used component
+export const Avatar = React.memo(AvatarComponent);

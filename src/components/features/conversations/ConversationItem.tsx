@@ -13,7 +13,7 @@ interface ConversationItemProps {
   isDeleting: boolean;
 }
 
-export const ConversationItem: React.FC<ConversationItemProps> = ({
+const ConversationItemComponent: React.FC<ConversationItemProps> = ({
   conversation,
   isActive,
   onConversationClick,
@@ -74,3 +74,6 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders in conversation lists
+export const ConversationItem = React.memo(ConversationItemComponent);

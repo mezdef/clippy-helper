@@ -2,7 +2,7 @@
 import React, { JSX } from 'react';
 import { Bot } from 'lucide-react';
 
-export const TypingIndicator: React.FC = (): JSX.Element => {
+const TypingIndicatorComponent: React.FC = (): JSX.Element => {
   return (
     <div className="flex items-start space-x-3 p-4">
       <div className="flex-shrink-0">
@@ -28,3 +28,6 @@ export const TypingIndicator: React.FC = (): JSX.Element => {
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders since this component has no props
+export const TypingIndicator = React.memo(TypingIndicatorComponent);
