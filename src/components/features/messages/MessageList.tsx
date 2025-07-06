@@ -4,10 +4,11 @@ import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
 import { TypingIndicator } from '@/components/ui/TypingIndicator';
 import { MessageListTitle } from './MessageListTitle';
-import type { EditingItem } from '@/types';
+import { generateMapKey } from '@/utils/generateMapKey';
+import type { EditingItem, MessageRole } from '@/types';
 
 interface MessageType {
-  role: 'user' | 'assistant';
+  role: MessageRole;
   text: string;
   id?: string;
   excerpts?: Array<{
@@ -77,7 +78,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         <div className="space-y-6">
           {messages.map((message: MessageType, index: number) => (
             <Message
-              key={message.id || index}
+              key={generateMapKey(message, index, ['role', 'text', 'excerpts'])}
               role={message.role}
               text={message.text}
               messageId={message.id}
