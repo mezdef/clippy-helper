@@ -1,3 +1,4 @@
+'use client';
 import { Error } from '@/components/ui/Error';
 
 interface ErrorPageProps {
