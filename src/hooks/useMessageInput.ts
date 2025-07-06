@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
-import type { ChatInputFormRef } from '@/components/content/messages';
+import type { ChatInputFormRef } from '@/app/conversations/[id]/_components/messages';
 import type { FormattedMessage } from '@/services/message.service';
 
 type FormData = { chatInput: string };

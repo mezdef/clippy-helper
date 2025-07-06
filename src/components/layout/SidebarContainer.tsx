@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 import { SidebarMenu, type SidebarMenuRef } from '@/components/layout';
-import { ConversationList } from '@/components/content/conversations';
+import { ConversationList } from './conversations';
 
 export const SidebarContainer: React.FC = () => {
   const sidebarRef = useRef<SidebarMenuRef>(null);

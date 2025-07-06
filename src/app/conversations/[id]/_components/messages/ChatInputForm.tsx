@@ -1,6 +1,6 @@
 'use client';
 import React, { JSX, useState, forwardRef, useImperativeHandle } from 'react';
-import { Form, Input } from '@/components/ui/forms';
+import { Form, FormField, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { useMessageInput } from '@/hooks/useMessageInput';
@@ -57,11 +57,12 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
             className="flex flex-row gap-2 w-full items-end"
           >
             <div className="flex-1">
-              <Input
-                id="chatInput"
-                label="Ask Clippy for something..."
-                placeholder="I'd like to write a letter..."
-              />
+              <FormField label="Ask Clippy for something...">
+                <Input
+                  id="chatInput"
+                  placeholder="I'd like to write a letter..."
+                />
+              </FormField>
             </div>
             <button
               type="submit"
