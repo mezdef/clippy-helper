@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { AiRequestInput } from '@/api/chat/route';
 import { useCreateMessage, useDeleteMessage } from './useMessages';
 import { useAppState } from './useAppState';
 import type { PromptFormRef } from '@/components/features/prompt';
 import type { FormattedMessage } from '@/services/message.service';
 import type { PromptFormData } from '@/types';
+import type { AiRequestInput } from '@/services/llm.service';
 
 interface UseMessageInputProps {
   conversationId: string;
@@ -34,21 +34,61 @@ export const useMessageInput = ({
   const { setIsSubmitting, setIsEditingMessage, isSubmitting } = useAppState();
   const promptFormRef = useRef<PromptFormRef | null>(null);
 
+  /**
+   * Build conversation context from existing messages
+   */
+  const buildConversationContext = (
+    existingMessages: FormattedMessage[]
+  ): AiRequestInput[] => {
+    return existingMessages
+      .filter(msg => msg.role === 'user')
+      .map(msg => ({
+        role: msg.role as 'user' | 'assistant' | 'system',
+        content: msg.text || '',
+      }));
+  };
+
+  /**
+   * Create a complete conversation request with new user message
+   */
+  const createConversationRequest = (
+    existingMessages: FormattedMessage[],
+    newUserMessage: string
+  ): AiRequestInput[] => {
+    const conversationContext = buildConversationContext(existingMessages);
+
+    return [
+      ...conversationContext,
+      {
+        role: 'user',
+        content: newUserMessage,
+      },
+    ];
+  };
+
+  /**
+   * Send request to LLM API
+   */
   const sendChatRequest = async (
     aiRequests: AiRequestInput[]
   ): Promise<any> => {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(aiRequests),
-    });
+    try {
+      const response = await fetch('/api/llm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(aiRequests),
+      });
 
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || 'Unknown error');
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Unknown error');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error sending LLM request:', error);
+      throw error;
     }
-
-    return result;
   };
 
   const handleEditMessage = async (
@@ -90,22 +130,16 @@ export const useMessageInput = ({
 
       // Get existing messages to build AI request context
       const existingMessages =
-        (queryClient.getQueryData(['messages', conversationId]) as any[]) || [];
-      const userMessages = existingMessages
-        .filter((msg: any) => msg.role === 'user')
-        .map((msg: any) => ({
-          role: msg.role as 'user' | 'assistant' | 'system',
-          content: msg.text || msg.content || '',
-        }));
+        (queryClient.getQueryData([
+          'messages',
+          conversationId,
+        ]) as FormattedMessage[]) || [];
 
-      // Add the new user message to the context
-      const newAiRequests: AiRequestInput[] = [
-        ...userMessages,
-        {
-          role: 'user',
-          content: text,
-        },
-      ];
+      // Create conversation request with new user message
+      const newAiRequests: AiRequestInput[] = createConversationRequest(
+        existingMessages,
+        text
+      );
 
       // Get AI response
       const result = await sendChatRequest(newAiRequests);
@@ -141,22 +175,16 @@ export const useMessageInput = ({
 
       // Get existing messages to build AI request context
       const existingMessages =
-        (queryClient.getQueryData(['messages', conversationId]) as any[]) || [];
-      const userMessages = existingMessages
-        .filter((msg: any) => msg.role === 'user')
-        .map((msg: any) => ({
-          role: msg.role as 'user' | 'assistant' | 'system',
-          content: msg.text || msg.content || '',
-        }));
+        (queryClient.getQueryData([
+          'messages',
+          conversationId,
+        ]) as FormattedMessage[]) || [];
 
-      // Add the new user message to the context
-      const newAiRequests: AiRequestInput[] = [
-        ...userMessages,
-        {
-          role: 'user',
-          content: data.prompt,
-        },
-      ];
+      // Create conversation request with new user message
+      const newAiRequests: AiRequestInput[] = createConversationRequest(
+        existingMessages,
+        data.prompt
+      );
 
       // Get AI response
       const result = await sendChatRequest(newAiRequests);
