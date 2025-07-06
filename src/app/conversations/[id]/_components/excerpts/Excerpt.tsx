@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Edit2, Trash2 } from 'lucide-react';
-import { EditExcerptsForm } from '@/app/conversations/[id]/_components/EditExcerptsForm';
+import { EditExcerptForm } from './EditExcerptForm';
 
 export interface Excerpt {
   id: string;
@@ -43,7 +43,7 @@ export const Excerpt: React.FC<ExcerptProps> = ({
 
   if (isEditing) {
     return (
-      <EditExcerptsForm
+      <EditExcerptForm
         excerpt={excerpt}
         onSave={handleSave}
         onCancel={handleCancel}

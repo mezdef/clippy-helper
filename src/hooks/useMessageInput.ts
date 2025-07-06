@@ -16,9 +16,8 @@ interface UseMessageInputReturn {
   methods: ReturnType<typeof useForm<FormData>>;
   onSubmit: (data: FormData) => Promise<void>;
   isSubmitting: boolean;
-  reAskedMessageId: string | null;
-  handleReAsk: (text: string, messageId: string) => void;
-  handleMessageSubmitted: () => Promise<void>;
+  isEditingMessage: boolean;
+  handleEditMessage: (text: string, messageId: string) => Promise<void>;
   chatInputRef: React.RefObject<ChatInputFormRef | null>;
 }
 
@@ -30,7 +29,7 @@ export const useMessageInput = ({
   const createMessageMutation = useCreateMessage();
   const deleteMessageMutation = useDeleteMessage();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reAskedMessageId, setReAskedMessageId] = useState<string | null>(null);
+  const [isEditingMessage, setIsEditingMessage] = useState(false);
   const chatInputRef = useRef<ChatInputFormRef | null>(null);
 
   const sendChatRequest = async (
@@ -50,14 +49,12 @@ export const useMessageInput = ({
     return result;
   };
 
-  const handleReAsk = (text: string, messageId: string) => {
-    chatInputRef.current?.setValue(text);
-    chatInputRef.current?.focus();
-    setReAskedMessageId(messageId);
-  };
-
-  const handleMessageSubmitted = async () => {
-    if (reAskedMessageId) {
+  const handleEditMessage = async (
+    text: string,
+    messageId: string
+  ): Promise<void> => {
+    setIsEditingMessage(true);
+    try {
       const currentMessages =
         (queryClient.getQueryData([
           'messages',
@@ -65,34 +62,72 @@ export const useMessageInput = ({
         ]) as FormattedMessage[]) || [];
 
       const messageIndex = currentMessages.findIndex(
-        msg => msg.id === reAskedMessageId
+        msg => msg.id === messageId
       );
 
       if (messageIndex !== -1) {
         const messagesToDelete = currentMessages.slice(messageIndex);
 
-        try {
-          for (const message of messagesToDelete) {
-            await deleteMessageMutation.mutateAsync({
-              conversationId,
-              messageId: message.id,
-            });
-          }
-        } catch (error) {
-          console.error('Error deleting messages:', error);
+        // Delete messages first
+        for (const message of messagesToDelete) {
+          await deleteMessageMutation.mutateAsync({
+            conversationId,
+            messageId: message.id,
+          });
         }
       }
 
-      setReAskedMessageId(null);
+      // Save new user message to database
+      await createMessageMutation.mutateAsync({
+        conversationId,
+        messageData: {
+          role: 'user',
+          content: text,
+        },
+      });
+
+      // Get existing messages to build AI request context
+      const existingMessages =
+        (queryClient.getQueryData(['messages', conversationId]) as any[]) || [];
+      const userMessages = existingMessages
+        .filter((msg: any) => msg.role === 'user')
+        .map((msg: any) => ({
+          role: msg.role as 'user' | 'assistant' | 'system',
+          content: msg.text || msg.content || '',
+        }));
+
+      // Add the new user message to the context
+      const newAiRequests: AiRequestInput[] = [
+        ...userMessages,
+        {
+          role: 'user',
+          content: text,
+        },
+      ];
+
+      // Get AI response
+      const result = await sendChatRequest(newAiRequests);
+
+      // Save AI message to database with excerpts
+      await createMessageMutation.mutateAsync({
+        conversationId,
+        messageData: {
+          role: 'assistant',
+          content: JSON.stringify(result.output_parsed),
+          aiResponse: result.output_parsed,
+        },
+      });
+    } catch (err) {
+      console.error('Error in direct re-ask:', err);
+      throw err;
+    } finally {
+      setIsEditingMessage(false);
     }
   };
 
   const onSubmit = async (data: FormData): Promise<void> => {
     setIsSubmitting(true);
     try {
-      // Handle re-ask cleanup if needed
-      await handleMessageSubmitted();
-
       // Save user message to database first
       await createMessageMutation.mutateAsync({
         conversationId,
@@ -146,9 +181,8 @@ export const useMessageInput = ({
     methods,
     onSubmit,
     isSubmitting,
-    reAskedMessageId,
-    handleReAsk,
-    handleMessageSubmitted,
+    isEditingMessage,
+    handleEditMessage,
     chatInputRef,
   };
 };

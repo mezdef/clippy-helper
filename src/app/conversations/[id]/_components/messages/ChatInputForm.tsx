@@ -7,7 +7,6 @@ import { useMessageInput } from '@/hooks/useMessageInput';
 
 interface ChatInputFormProps {
   conversationId: string;
-  onMessageSubmitted?: () => void;
 }
 
 export interface ChatInputFormRef {
@@ -17,7 +16,7 @@ export interface ChatInputFormRef {
 }
 
 export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
-  ({ conversationId, onMessageSubmitted }, ref): JSX.Element => {
+  ({ conversationId }, ref): JSX.Element => {
     const { methods, onSubmit, isSubmitting } = useMessageInput({
       conversationId,
     });
@@ -39,9 +38,6 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
 
     const handleSubmit = async (data: { chatInput: string }) => {
       try {
-        // Trigger cleanup immediately before creating the new message
-        onMessageSubmitted?.();
-        // Then create the new message
         await onSubmit(data);
       } catch (error) {
         console.error('Error submitting message:', error);

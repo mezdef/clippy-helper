@@ -5,7 +5,6 @@ import { useConversation } from '@/hooks/useConversations';
 import { MessageList, ChatInputForm } from './_components/messages';
 import { useMessageInput } from '@/hooks/useMessageInput';
 import { LoadingPage } from '@/components/ui/loading';
-import { Error as ErrorComponent } from '@/components/ui/Error';
 import { formatDate } from '@/utils/date';
 
 export default function ConversationPage(): JSX.Element {
@@ -21,7 +20,7 @@ export default function ConversationPage(): JSX.Element {
     messagesError,
   } = useConversation(conversationId);
 
-  const { handleReAsk, handleMessageSubmitted, chatInputRef } = useMessageInput(
+  const { handleEditMessage, isEditingMessage, chatInputRef } = useMessageInput(
     {
       conversationId,
     }
@@ -52,14 +51,10 @@ export default function ConversationPage(): JSX.Element {
         messages={messages}
         conversationTitle={conversation.title}
         conversationCreatedAt={formatDate(conversation.createdAt)}
-        onReAsk={handleReAsk}
-        isTyping={chatInputRef.current?.isSubmitting || false}
+        onEditMessage={handleEditMessage}
+        isTyping={chatInputRef.current?.isSubmitting || isEditingMessage}
       />
-      <ChatInputForm
-        ref={chatInputRef}
-        conversationId={conversationId}
-        onMessageSubmitted={handleMessageSubmitted}
-      />
+      <ChatInputForm ref={chatInputRef} conversationId={conversationId} />
     </div>
   );
 }

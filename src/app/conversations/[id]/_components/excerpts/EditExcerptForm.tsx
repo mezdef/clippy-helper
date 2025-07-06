@@ -9,7 +9,7 @@ interface EditExcerptFormData {
   content: string;
 }
 
-interface EditExcerptsFormProps {
+interface EditExcerptFormProps {
   excerpt: {
     id: string;
     title: string;
@@ -19,7 +19,7 @@ interface EditExcerptsFormProps {
   onCancel: () => void;
 }
 
-export const EditExcerptsForm: React.FC<EditExcerptsFormProps> = ({
+export const EditExcerptForm: React.FC<EditExcerptFormProps> = ({
   excerpt,
   onSave,
   onCancel,

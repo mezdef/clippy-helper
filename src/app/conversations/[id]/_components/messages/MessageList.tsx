@@ -21,7 +21,7 @@ interface MessageListProps {
   messages: MessageType[];
   conversationTitle?: string;
   conversationCreatedAt?: string;
-  onReAsk?: (text: string, messageId: string) => void;
+  onEditMessage?: (text: string, messageId: string) => Promise<void>;
   isTyping?: boolean;
 }
 
@@ -29,7 +29,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   messages,
   conversationTitle,
   conversationCreatedAt,
-  onReAsk,
+  onEditMessage,
   isTyping = false,
 }): JSX.Element => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -76,7 +76,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               role={message.role}
               text={message.text}
               messageId={message.id}
-              onReAsk={onReAsk}
+              onEditMessage={onEditMessage}
               excerpts={message.excerpts}
             />
           ))}

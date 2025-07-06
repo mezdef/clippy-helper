@@ -1,15 +1,16 @@
 'use client';
-import React, { JSX } from 'react';
-import { Bot, User, RotateCcw } from 'lucide-react';
+import React, { JSX, useState } from 'react';
+import { User, Edit2 } from 'lucide-react';
 import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar } from '@/components/ui/Avatar';
 import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
+import { EditMessageForm } from './EditMessageForm';
 
 interface MessageProps {
   role: 'user' | 'assistant';
   text?: string;
   messageId?: string;
-  onReAsk?: (text: string, messageId: string) => void;
+  onEditMessage?: (text: string, messageId: string) => Promise<void>;
   excerpts?: Array<{
     id: string;
     title: string;
@@ -22,17 +23,14 @@ export const Message: React.FC<MessageProps> = ({
   role,
   text,
   messageId,
-  onReAsk,
+  onEditMessage,
   excerpts = [],
 }): JSX.Element => {
+  const [isEditing, setIsEditing] = useState(false);
   const updateExcerptMutation = useUpdateExcerpt();
   const deleteExcerptMutation = useDeleteExcerpt();
 
   const isUser = role === 'user';
-  const Icon = isUser ? User : Bot;
-  const iconColor = isUser
-    ? 'text-green-600 dark:text-green-300'
-    : 'text-blue-600 dark:text-blue-300';
   const padding = isUser ? 'p-4' : 'p-0';
   const bgColor = isUser
     ? 'bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100'
@@ -59,29 +57,38 @@ export const Message: React.FC<MessageProps> = ({
     }
   };
 
+  const handleEditSave = async (editedText: string) => {
+    await onEditMessage?.(editedText, messageId!);
+    setIsEditing(false);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false);
+  };
+
   return (
     <div className={`flex gap-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && <Avatar role={role} />}
 
-      <div className={`max-w-3xl ${bgColor} ${padding} rounded-lg`}>
+      <div
+        className={`${isEditing ? 'w-full' : 'max-w-3xl'} ${bgColor} ${padding} rounded-lg`}
+      >
         <div className="space-y-3">
-          {/* Display text content */}
+          {/* Display text content or edit form */}
           {isUser && text && (
-            <div className="space-y-2">
-              <p className="whitespace-pre-line text-sm">{text}</p>
-              {onReAsk && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => onReAsk(text, messageId!)}
-                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium cursor-pointer flex items-center gap-1 transition-colors"
-                    title="Re-ask this question"
-                  >
-                    <RotateCcw className="h-3 w-3" />
-                    Re-ask
-                  </button>
+            <>
+              {isEditing ? (
+                <EditMessageForm
+                  message={{ id: messageId!, text: text! }}
+                  onSave={handleEditSave}
+                  onCancel={handleEditCancel}
+                />
+              ) : (
+                <div className="space-y-2">
+                  <p className="whitespace-pre-line text-sm">{text}</p>
                 </div>
               )}
-            </div>
+            </>
           )}
 
           {!isUser && excerpts.length > 0 && (
@@ -95,7 +102,20 @@ export const Message: React.FC<MessageProps> = ({
         </div>
       </div>
 
-      {isUser && <Avatar role={role} />}
+      {isUser && (
+        <div className="flex flex-col items-center gap-2">
+          <Avatar role={role} />
+          {onEditMessage && text && !isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs cursor-pointer flex items-center justify-center transition-colors"
+              title="Edit this message"
+            >
+              <Edit2 className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
