@@ -4,6 +4,7 @@ import { MessageSquare } from 'lucide-react';
 import { Message } from './Message';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageListTitle } from './MessageListTitle';
+import type { EditingItem } from '@/types';
 
 interface MessageType {
   role: 'user' | 'assistant';
@@ -23,16 +24,8 @@ interface MessageListProps {
   conversationCreatedAt?: string;
   onEditMessage?: (text: string, messageId: string) => Promise<void>;
   isTyping?: boolean;
-  editingItem?: {
-    type: 'message' | 'excerpt';
-    id: string;
-  } | null;
-  setEditingItem?: (
-    item: {
-      type: 'message' | 'excerpt';
-      id: string;
-    } | null
-  ) => void;
+  editingItem?: EditingItem | null;
+  setEditingItem?: (item: EditingItem | null) => void;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({

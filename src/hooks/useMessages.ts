@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAppState } from './useAppState';
 import type { MessageWithExcerpts } from '@/db/schema';
 import type { FormattedMessage } from '@/services/message.service';
 
 // Create a new message
 export const useCreateMessage = () => {
   const queryClient = useQueryClient();
-  const { setIsSubmitting } = useAppState();
 
   return useMutation({
     mutationFn: async ({
@@ -31,21 +29,7 @@ export const useCreateMessage = () => {
 
       return response.json();
     },
-    onMutate: async ({ messageData }) => {
-      // Set loading state
-      if (messageData.role === 'user') {
-        setIsSubmitting(true);
-      }
-
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['messages'] });
-    },
-    onSuccess: (newMessage, { conversationId, messageData }) => {
-      // Clear loading state
-      if (messageData.role === 'assistant') {
-        setIsSubmitting(false);
-      }
-
+    onSuccess: (newMessage, { conversationId }) => {
       // Add the new message to the messages cache
       queryClient.setQueryData(
         ['messages', conversationId],
@@ -65,10 +49,6 @@ export const useCreateMessage = () => {
       queryClient.invalidateQueries({
         queryKey: ['conversation', conversationId],
       });
-    },
-    onError: () => {
-      // Clear loading state on error
-      setIsSubmitting(false);
     },
   });
 };

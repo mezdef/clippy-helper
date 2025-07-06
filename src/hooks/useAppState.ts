@@ -1,11 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { EditingItem } from '@/types';
 
 // Global app state interface
 interface AppState {
-  editingItem: {
-    type: 'message' | 'excerpt';
-    id: string;
-  } | null;
+  editingItem: EditingItem | null;
   isSubmitting: boolean;
   isEditingMessage: boolean;
 }
@@ -41,7 +39,7 @@ export const useAppState = () => {
   });
 
   // Convenience functions
-  const setEditingItem = (item: AppState['editingItem']) => {
+  const setEditingItem = (item: EditingItem | null) => {
     updateAppStateMutation.mutate({ editingItem: item });
   };
 
