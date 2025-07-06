@@ -8,6 +8,7 @@ import { useMessageInput } from '@/hooks/useMessageInput';
 
 interface ChatInputFormProps {
   conversationId: string;
+  onFocus?: () => void;
 }
 
 export interface ChatInputFormRef {
@@ -17,7 +18,7 @@ export interface ChatInputFormRef {
 }
 
 export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
-  ({ conversationId }, ref): JSX.Element => {
+  ({ conversationId, onFocus }, ref): JSX.Element => {
     const { methods, onSubmit, isSubmitting } = useMessageInput({
       conversationId,
     });
@@ -58,6 +59,7 @@ export const ChatInputForm = forwardRef<ChatInputFormRef, ChatInputFormProps>(
                 id="chatInput"
                 placeholder="I'd like to write a letter..."
                 className="rounded-r-none h-12 text-lg"
+                onFocus={onFocus}
               />
             </div>
             <Button

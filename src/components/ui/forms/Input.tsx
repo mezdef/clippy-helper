@@ -5,12 +5,14 @@ interface InputProps {
   id: string;
   placeholder?: string;
   className?: string;
+  onFocus?: () => void;
 }
 
 export const Input: React.FC<InputProps> = ({
   id,
   placeholder,
   className,
+  onFocus,
 }): JSX.Element => {
   const {
     register,
@@ -27,6 +29,7 @@ export const Input: React.FC<InputProps> = ({
           (className || '')
         }
         placeholder={placeholder}
+        onFocus={onFocus}
       />
       {error && <span className="text-red-500 text-xs">{error}</span>}
     </>

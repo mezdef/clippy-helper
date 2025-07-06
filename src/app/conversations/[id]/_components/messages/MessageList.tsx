@@ -23,6 +23,16 @@ interface MessageListProps {
   conversationCreatedAt?: string;
   onEditMessage?: (text: string, messageId: string) => Promise<void>;
   isTyping?: boolean;
+  editingItem?: {
+    type: 'message' | 'excerpt';
+    id: string;
+  } | null;
+  setEditingItem?: React.Dispatch<
+    React.SetStateAction<{
+      type: 'message' | 'excerpt';
+      id: string;
+    } | null>
+  >;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -31,6 +41,8 @@ export const MessageList: React.FC<MessageListProps> = ({
   conversationCreatedAt,
   onEditMessage,
   isTyping = false,
+  editingItem,
+  setEditingItem,
 }): JSX.Element => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -78,6 +90,8 @@ export const MessageList: React.FC<MessageListProps> = ({
               messageId={message.id}
               onEditMessage={onEditMessage}
               excerpts={message.excerpts}
+              editingItem={editingItem}
+              setEditingItem={setEditingItem}
             />
           ))}
           {isTyping && <TypingIndicator />}

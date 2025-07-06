@@ -16,24 +16,38 @@ interface ExcerptProps {
   excerpt: Excerpt;
   onEdit?: (id: string, content: string, title: string) => void;
   onDelete?: (id: string) => void;
+  editingItem?: {
+    type: 'message' | 'excerpt';
+    id: string;
+  } | null;
+  setEditingItem?: React.Dispatch<
+    React.SetStateAction<{
+      type: 'message' | 'excerpt';
+      id: string;
+    } | null>
+  >;
 }
 
 export const Excerpt: React.FC<ExcerptProps> = ({
   excerpt,
   onEdit,
   onDelete,
+  editingItem,
+  setEditingItem,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  // Check if this excerpt is being edited
+  const isEditing =
+    editingItem?.type === 'excerpt' && editingItem?.id === excerpt.id;
 
   const handleSave = (id: string, content: string, title: string) => {
     if (onEdit) {
       onEdit(id, content, title);
     }
-    setIsEditing(false);
+    setEditingItem?.(null);
   };
 
   const handleCancel = () => {
-    setIsEditing(false);
+    setEditingItem?.(null);
   };
 
   const handleDelete = () => {
@@ -66,7 +80,11 @@ export const Excerpt: React.FC<ExcerptProps> = ({
       </div>
       <div className="flex flex-col items-center gap-2">
         <Button
-          onClick={isEditing ? handleCancel : () => setIsEditing(true)}
+          onClick={
+            isEditing
+              ? handleCancel
+              : () => setEditingItem?.({ type: 'excerpt', id: excerpt.id })
+          }
           icon={isEditing ? X : Edit2}
           variant="ghost"
           size="sm"

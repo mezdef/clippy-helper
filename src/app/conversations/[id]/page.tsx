@@ -1,5 +1,5 @@
 'use client';
-import React, { JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useConversation } from '@/hooks/useConversations';
 import { MessageList, ChatInputForm } from './_components/messages';
@@ -25,6 +25,12 @@ export default function ConversationPage(): JSX.Element {
       conversationId,
     }
   );
+
+  // State to manage which item is being edited (message or excerpt)
+  const [editingItem, setEditingItem] = useState<{
+    type: 'message' | 'excerpt';
+    id: string;
+  } | null>(null);
 
   // Show loading state while data is being fetched
   if (isLoading) {
@@ -53,8 +59,14 @@ export default function ConversationPage(): JSX.Element {
         conversationCreatedAt={formatDate(conversation.createdAt)}
         onEditMessage={handleEditMessage}
         isTyping={chatInputRef.current?.isSubmitting || isEditingMessage}
+        editingItem={editingItem}
+        setEditingItem={setEditingItem}
       />
-      <ChatInputForm ref={chatInputRef} conversationId={conversationId} />
+      <ChatInputForm
+        ref={chatInputRef}
+        conversationId={conversationId}
+        onFocus={() => setEditingItem(null)}
+      />
     </div>
   );
 }

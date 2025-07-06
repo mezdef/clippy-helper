@@ -17,6 +17,16 @@ interface MessageProps {
     content: string;
     order: string;
   }>;
+  editingItem?: {
+    type: 'message' | 'excerpt';
+    id: string;
+  } | null;
+  setEditingItem?: React.Dispatch<
+    React.SetStateAction<{
+      type: 'message' | 'excerpt';
+      id: string;
+    } | null>
+  >;
 }
 
 export const Message: React.FC<MessageProps> = ({
@@ -25,8 +35,12 @@ export const Message: React.FC<MessageProps> = ({
   messageId,
   onEditMessage,
   excerpts = [],
+  editingItem,
+  setEditingItem,
 }): JSX.Element => {
-  const [isEditing, setIsEditing] = useState(false);
+  // Check if this message is being edited
+  const isEditing =
+    editingItem?.type === 'message' && editingItem?.id === messageId;
   const updateExcerptMutation = useUpdateExcerpt();
   const deleteExcerptMutation = useDeleteExcerpt();
 
@@ -59,11 +73,11 @@ export const Message: React.FC<MessageProps> = ({
 
   const handleEditSave = async (editedText: string) => {
     await onEditMessage?.(editedText, messageId!);
-    setIsEditing(false);
+    setEditingItem?.(null);
   };
 
   const handleEditCancel = () => {
-    setIsEditing(false);
+    setEditingItem?.(null);
   };
 
   return (
@@ -99,6 +113,8 @@ export const Message: React.FC<MessageProps> = ({
               borderColor={borderColor}
               onEditExcerpt={handleEditExcerpt}
               onDeleteExcerpt={handleDeleteExcerpt}
+              editingItem={editingItem}
+              setEditingItem={setEditingItem}
             />
           )}
         </div>
@@ -109,7 +125,11 @@ export const Message: React.FC<MessageProps> = ({
           <Avatar role={role} />
           {onEditMessage && text && (
             <Button
-              onClick={isEditing ? handleEditCancel : () => setIsEditing(true)}
+              onClick={
+                isEditing
+                  ? handleEditCancel
+                  : () => setEditingItem?.({ type: 'message', id: messageId! })
+              }
               icon={isEditing ? X : Edit2}
               size="sm"
               variant="ghost"

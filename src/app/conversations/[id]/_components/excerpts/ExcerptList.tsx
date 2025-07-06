@@ -8,6 +8,16 @@ interface ExcerptsListProps {
   borderColor?: string;
   onEditExcerpt?: (id: string, content: string, title: string) => void;
   onDeleteExcerpt?: (id: string) => void;
+  editingItem?: {
+    type: 'message' | 'excerpt';
+    id: string;
+  } | null;
+  setEditingItem?: React.Dispatch<
+    React.SetStateAction<{
+      type: 'message' | 'excerpt';
+      id: string;
+    } | null>
+  >;
 }
 
 export const ExcerptsList: React.FC<ExcerptsListProps> = ({
@@ -15,6 +25,8 @@ export const ExcerptsList: React.FC<ExcerptsListProps> = ({
   borderColor = 'border-blue-500',
   onEditExcerpt,
   onDeleteExcerpt,
+  editingItem,
+  setEditingItem,
 }) => {
   if (!excerpts || excerpts.length === 0) return null;
   return (
@@ -25,6 +37,8 @@ export const ExcerptsList: React.FC<ExcerptsListProps> = ({
             excerpt={excerpt}
             onEdit={onEditExcerpt}
             onDelete={onDeleteExcerpt}
+            editingItem={editingItem}
+            setEditingItem={setEditingItem}
           />
         </div>
       ))}
