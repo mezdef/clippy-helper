@@ -5,8 +5,11 @@ import { useCreateMessage, useDeleteMessage } from './useMessages';
 import { useAppState } from './useAppState';
 import type { PromptFormRef } from '@/components/features/prompt';
 import type { FormattedMessage } from '@/services/message.service';
-import type { PromptFormData } from '@/types';
-import type { AiRequestInput } from '@/services/llm.service';
+import type { PromptFormData, MessageCreateData } from '@/types';
+import type {
+  AiRequestInput,
+  AiResponseStructured,
+} from '@/services/llm.service';
 
 interface UsePromptProps {
   conversationId: string;
@@ -71,7 +74,7 @@ export const usePrompt = ({
    */
   const sendPromptRequest = async (
     aiRequests: AiRequestInput[]
-  ): Promise<any> => {
+  ): Promise<AiResponseStructured> => {
     try {
       const response = await fetch('/api/llm', {
         method: 'POST',
@@ -123,9 +126,9 @@ export const usePrompt = ({
       await createMessageMutation.mutateAsync({
         conversationId,
         messageData: {
-          role: 'user',
+          role: 'user' as const,
           content: text,
-        },
+        } satisfies MessageCreateData,
       });
 
       // Get existing messages to build AI request context
@@ -148,10 +151,10 @@ export const usePrompt = ({
       await createMessageMutation.mutateAsync({
         conversationId,
         messageData: {
-          role: 'assistant',
+          role: 'assistant' as const,
           content: JSON.stringify(result.output_parsed),
           aiResponse: result.output_parsed,
-        },
+        } satisfies MessageCreateData,
       });
     } catch (err) {
       console.error('Error in direct re-ask:', err);
@@ -168,9 +171,9 @@ export const usePrompt = ({
       await createMessageMutation.mutateAsync({
         conversationId,
         messageData: {
-          role: 'user',
+          role: 'user' as const,
           content: data.prompt,
-        },
+        } satisfies MessageCreateData,
       });
 
       // Get existing messages to build AI request context
@@ -193,10 +196,10 @@ export const usePrompt = ({
       await createMessageMutation.mutateAsync({
         conversationId,
         messageData: {
-          role: 'assistant',
+          role: 'assistant' as const,
           content: JSON.stringify(result.output_parsed),
           aiResponse: result.output_parsed,
-        },
+        } satisfies MessageCreateData,
       });
     } catch (err) {
       console.error('Error in prompt submission:', err);

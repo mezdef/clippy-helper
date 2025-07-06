@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { excerpts, type NewExcerpt } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import type { AdviceList } from '@/types';
 
 export const excerptService = {
   // Create a new excerpt
@@ -28,7 +29,7 @@ export const excerptService = {
   },
 
   // Save excerpts from AI response
-  async saveFromAiResponse(messageId: string, aiResponse: any) {
+  async saveFromAiResponse(messageId: string, aiResponse: AdviceList) {
     if (
       aiResponse?.list &&
       Array.isArray(aiResponse.list) &&

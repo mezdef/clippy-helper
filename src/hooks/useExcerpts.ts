@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppState } from './useAppState';
 import type { FormattedMessage } from '@/services/message.service';
+import type { Excerpt } from '@/db/schema';
 
 // Update an excerpt
 export const useUpdateExcerpt = () => {
@@ -16,7 +17,7 @@ export const useUpdateExcerpt = () => {
       id: string;
       content: string;
       title: string;
-    }): Promise<any> => {
+    }): Promise<Excerpt> => {
       const response = await fetch(`/api/excerpts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

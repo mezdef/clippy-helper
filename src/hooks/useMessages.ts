@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { MessageWithExcerpts } from '@/db/schema';
 import type { FormattedMessage } from '@/services/message.service';
+import type { MessageCreateData, MessageRole } from '@/types';
 
 // Create a new message
 export const useCreateMessage = () => {
@@ -12,7 +13,7 @@ export const useCreateMessage = () => {
       messageData,
     }: {
       conversationId: string;
-      messageData: { role: string; content: string; aiResponse?: any };
+      messageData: MessageCreateData;
     }): Promise<MessageWithExcerpts> => {
       const response = await fetch(
         `/api/conversations/${conversationId}/messages`,
@@ -37,7 +38,7 @@ export const useCreateMessage = () => {
           // Format the new message to match the cache structure
           const formattedMessage: FormattedMessage = {
             id: newMessage.id,
-            role: newMessage.role as 'user' | 'assistant',
+            role: newMessage.role as MessageRole,
             text: newMessage.content,
             excerpts: newMessage.excerpts || [],
           };

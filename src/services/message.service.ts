@@ -9,24 +9,20 @@ import {
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { excerptService } from './excerpt.service';
+import type { AdviceList, ExcerptData, MessageRole } from '@/types';
 
 export interface FormattedMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: MessageRole;
   text: string;
-  excerpts: Array<{
-    id: string;
-    title: string;
-    content: string;
-    order: string;
-  }>;
+  excerpts: ExcerptData[];
 }
 
 export const messageService = {
   // Create a new message (optionally with excerpts for AI responses)
   async create(
     data: Omit<NewMessage, 'id' | 'createdAt'> & {
-      aiResponse?: any;
+      aiResponse?: AdviceList;
     }
   ): Promise<MessageWithExcerpts> {
     const { aiResponse, ...messageData } = data;
@@ -85,7 +81,7 @@ export const messageService = {
   formatMessagesForUI(messages: MessageWithExcerpts[]): FormattedMessage[] {
     return messages.map(msg => ({
       id: msg.id,
-      role: msg.role as 'user' | 'assistant',
+      role: msg.role as MessageRole,
       text: msg.content,
       excerpts: msg.excerpts,
     }));
