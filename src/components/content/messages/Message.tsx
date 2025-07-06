@@ -3,6 +3,7 @@ import React, { JSX } from 'react';
 import { Bot, User, RotateCcw } from 'lucide-react';
 import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar } from '@/components/ui/Avatar';
+import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
 
 interface MessageProps {
   role: 'user' | 'assistant';
@@ -24,21 +25,45 @@ export const Message: React.FC<MessageProps> = ({
   onReAsk,
   excerpts = [],
 }): JSX.Element => {
+  const updateExcerptMutation = useUpdateExcerpt();
+  const deleteExcerptMutation = useDeleteExcerpt();
+
   const isUser = role === 'user';
   const Icon = isUser ? User : Bot;
   const iconColor = isUser
     ? 'text-green-600 dark:text-green-300'
     : 'text-blue-600 dark:text-blue-300';
+  const padding = isUser ? 'p-4' : 'p-0';
   const bgColor = isUser
     ? 'bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100'
-    : 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100';
+    : 'bg-transparent';
   const borderColor = isUser ? 'border-green-500' : 'border-blue-500';
+
+  const handleEditExcerpt = async (
+    id: string,
+    content: string,
+    title: string
+  ) => {
+    try {
+      await updateExcerptMutation.mutateAsync({ id, content, title });
+    } catch (error) {
+      console.error('Error updating excerpt:', error);
+    }
+  };
+
+  const handleDeleteExcerpt = async (id: string) => {
+    try {
+      await deleteExcerptMutation.mutateAsync(id);
+    } catch (error) {
+      console.error('Error deleting excerpt:', error);
+    }
+  };
 
   return (
     <div className={`flex gap-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && <Avatar role={role} />}
 
-      <div className={`max-w-3xl ${bgColor} rounded-lg p-4`}>
+      <div className={`max-w-3xl ${bgColor} ${padding} rounded-lg`}>
         <div className="space-y-3">
           {/* Display text content */}
           {isUser && text && (
@@ -60,7 +85,12 @@ export const Message: React.FC<MessageProps> = ({
           )}
 
           {!isUser && excerpts.length > 0 && (
-            <ExcerptsList excerpts={excerpts} borderColor={borderColor} />
+            <ExcerptsList
+              excerpts={excerpts}
+              borderColor={borderColor}
+              onEditExcerpt={handleEditExcerpt}
+              onDeleteExcerpt={handleDeleteExcerpt}
+            />
           )}
         </div>
       </div>
