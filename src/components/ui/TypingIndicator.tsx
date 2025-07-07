@@ -1,4 +1,3 @@
-'use client';
 import React, { JSX } from 'react';
 import { Bot } from 'lucide-react';
 

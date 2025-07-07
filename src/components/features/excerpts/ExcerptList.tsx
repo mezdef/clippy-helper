@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
 import type { EditingItem } from '@/types';
