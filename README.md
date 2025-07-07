@@ -1,33 +1,201 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Clippy Helper
 
-## Getting Started
+An AI-powered assistant that provides answers structured as lists.
 
-First, run the development server:
-### Development
+## 🚀 Developer quick start (in terminal)
 
-Run the development server:
+1. Install dependencies
 
-```bash
+```
+bun install
+```
+
+2. Set up environment variables
+
+```
+cp .env.example .env
+```
+
+3. Add your OpenAI API key and database URL to the .env file (or copy in provided values)
+
+4. Push the database schema
+
+```
+bun run db:push
+```
+
+5. Start development server
+
+```
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Visit `http://localhost:3000` to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## About the project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🛠 Tech Stack
 
-## Learn More
+- **Framework**: Next.js 15 (App Router)
+- **Runtime**: Bun
+- **Database**: PostgreSQL with Drizzle ORM
+- **AI**: OpenAI GPT-4 with structured outputs
+- **Styling**: Tailwind CSS
+- **State**: React Query (TanStack Query)
+- **Types**: TypeScript with strict mode
 
-To learn more about Next.js, take a look at the following resources:
+### 📁 Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                      # Next.js App Router
+│ ├── api/                    # API routes
+│ │ ├── conversations/        # Conversation management
+│ │ ├── llm/                  # AI processing
+│ │ └── health/               # Health checks
+│ └── conversations/          # Chat UI pages
+├── components/               # React components
+│ ├── features/               # Feature-specific components
+│ ├── ui/                     # Reusable UI components
+│ └── layout/                 # Layout components
+├── services/                 # Business logic
+├── hooks/                    # Custom React hooks
+├── utils/                    # Utility functions
+├── types/                    # TypeScript definitions
+├── constants/                # Configuration constants
+└── db/                       # Database schema and config
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### ✨ Features
 
-## Deploy on Vercel
+#### AI Prompting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Natural Chat Interface**: Clean, intuitive conversation flow
+- **Structured Advice**: AI responses organized into actionable excerpts
+- **Message Editing**: Edit any message and regenerate conversation from that point
+- **Conversation History**: Persistent chat sessions with full context
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Data Management
+
+- **Smart Caching**: React Query optimizes data fetching and updates
+- **Real-time Updates**: Optimistic updates for smooth UX
+
+#### Developer Experience
+
+- **Type Safety**: Full TypeScript coverage with strict typing
+
+### 🔌 API Endpoints
+
+| Method           | Endpoint                                       | Purpose                   |
+| ---------------- | ---------------------------------------------- | ------------------------- |
+| `GET`            | `/api/health`                                  | System health check       |
+| `POST`           | `/api/llm`                                     | Generate AI responses     |
+| `GET/POST`       | `/api/conversations`                           | List/create conversations |
+| `GET/PUT/DELETE` | `/api/conversations/[id]`                      | Manage conversation       |
+| `GET/POST`       | `/api/conversations/[id]/messages`             | Conversation messages     |
+| `DELETE`         | `/api/conversations/[id]/messages/[messageId]` | Delete message            |
+| `GET/PUT`        | `/api/excerpts/[id]`                           | Manage excerpts           |
+
+### 🗄 Database Schema
+
+```sql
+-- Conversations
+conversations: id, title, created_at, updated_at
+
+-- Messages (user prompts and AI responses)
+messages: id, conversation_id, role, content, created_at
+
+-- Excerpts (structured AI advice items)
+excerpts: id, message_id, title, content, order
+```
+
+### ⚙️ Configuration
+
+#### Environment Variables (.env)
+
+```bash
+# Database
+DATABASE_URL=postgresql://...
+
+# OpenAI
+OPENAI_API_KEY=sk-...
+```
+
+### 🏗 Development Workflow
+
+#### Running the App
+
+```bash
+# Development
+bun run dev
+
+# Production build
+bun run build
+bun run start
+
+# Type checking
+bun run type-check
+
+# Linting
+bun run lint
+```
+
+#### Database Management
+
+```bash
+# Push schema to db
+bun run db:push
+
+# Generate migrations
+bun run db:generate
+
+# Apply migrations
+bun run db:migrate
+
+# View database
+bun run db:studio
+```
+
+## 🎯 Architecture Decisions
+
+### AI Response Flow
+
+1. **User Input** → Validation → Database storage
+2. **Context Building** → Filter user messages for AI context
+3. **AI Processing** → Structured output with title + advice list
+4. **Response Storage** → Message + individual excerpts
+5. **UI Updates** → Real-time cache invalidation
+
+### Message Editing
+
+- **Conversation Branching**: Editing creates new conversation path
+- **Cascade Deletion**: Remove edited message and all messages after edited point
+- **Context Regeneration**: Fresh AI response based on new state
+
+## 🚀 Deployment
+
+### Build Process
+
+```bash
+# Install dependencies
+bun install
+
+# Build application
+bun run build
+
+# Start production server
+bun run start
+```
+
+### Environment Setup
+
+1. Set up PostgreSQL database
+2. Run migrations: `bun run db:migrate`
+3. Configure environment variables
+4. Deploy to your platform of choice
+
+### Health Monitoring
+
+- **Health Check**: `GET /api/health`
+- **Error Tracking**: Comprehensive error logging
+- **Performance**: Built-in Next.js analytics
