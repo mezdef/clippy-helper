@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Save, X } from 'lucide-react';
+import { Save, X, AlertTriangle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui';
 import { Form, FormField, Textarea } from '@/components/ui/forms';
@@ -57,6 +57,13 @@ export const EditMessageForm: React.FC<EditMessageFormProps> = ({
           >
             Cancel
           </Button>
+        </div>
+        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            <strong>Warning:</strong> Editing this message will replace it and
+            all subsequent messages in the conversation with new AI responses.
+          </p>
         </div>
       </Form>
     </div>

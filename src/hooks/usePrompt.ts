@@ -189,7 +189,6 @@ export const usePrompt = ({
       throw error;
     } finally {
       setIsSubmitting(false);
-      methods.reset();
     }
   };
 

@@ -38,10 +38,22 @@ export const PromptForm = forwardRef<PromptFormRef, PromptFormProps>(
     }));
 
     const handleSubmit = async (data: { prompt: string }) => {
+      // Clear input and unfocus immediately when submit occurs
+      const input = document.getElementById('prompt') as HTMLInputElement;
+      if (input) {
+        input.blur();
+      }
+      methods.reset();
+
       try {
         await onSubmit(data);
       } catch (error) {
         console.error('Error submitting message:', error);
+        // If there's an error, restore the original text so user can retry
+        methods.setValue('prompt', data.prompt);
+        if (input) {
+          input.focus();
+        }
       }
     };
 
@@ -51,7 +63,7 @@ export const PromptForm = forwardRef<PromptFormRef, PromptFormProps>(
           <Form
             onSubmit={handleSubmit}
             methods={methods}
-            className="flex flex-row w-full items-end"
+            className="flex flex-row w-full items-start"
           >
             <div className="flex-1">
               <Input
