@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { messageService } from '@/services';
 import { HTTP_STATUS, ERROR_MESSAGES } from '@/constants';
 
+// GET /api/conversations/[id]/messages - Retrieves all messages for a conversation
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -29,6 +30,7 @@ export async function GET(
   }
 }
 
+// POST /api/conversations/[id]/messages - Creates a new message in a conversation
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

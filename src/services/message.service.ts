@@ -11,6 +11,7 @@ import { eq } from 'drizzle-orm';
 import { excerptService } from './excerpt.service';
 import type { AdviceList, ExcerptData, MessageRole } from '@/types';
 
+// UI-friendly message format that flattens the database structure
 export interface FormattedMessage {
   id: string;
   role: MessageRole;
@@ -18,8 +19,9 @@ export interface FormattedMessage {
   excerpts: ExcerptData[];
 }
 
+// Message service - handles conversation message storage and AI response processing
 export const messageService = {
-  // Create a new message (optionally with excerpts for AI responses)
+  // Create a new message, automatically extracting excerpts from AI responses
   async create(
     data: Omit<NewMessage, 'id' | 'createdAt'> & {
       aiResponse?: AdviceList;
@@ -27,13 +29,13 @@ export const messageService = {
   ): Promise<MessageWithExcerpts> {
     const { aiResponse, ...messageData } = data;
 
-    // Create the message first
+    // Create the message first to get its ID for excerpt relationships
     const [message] = await db.insert(messages).values(messageData).returning();
 
-    // Save excerpts if this is an AI response with structured content
+    // Extract and save structured advice as individual excerpts (for AI responses only)
     let messageExcerpts: Excerpt[] = [];
     if (aiResponse && messageData.role === 'assistant') {
-      // Create excerpts after message creation
+      // Process the AI's structured advice list into separate excerpt records
       if (
         aiResponse?.list &&
         Array.isArray(aiResponse.list) &&
@@ -52,8 +54,8 @@ export const messageService = {
             .values(excerptData)
             .returning();
         } catch (excerptError) {
-          // If excerpt creation fails, log the error but don't fail the entire operation
-          // The message will still be created, just without excerpts
+          // Don't fail the entire operation if excerpt creation fails
+          // The message is still valid without excerpts
           console.error('Failed to create excerpts:', excerptError);
         }
       }
@@ -65,7 +67,7 @@ export const messageService = {
     };
   },
 
-  // Get messages for a conversation with excerpts
+  // Get conversation messages with their excerpts, maintaining chronological order
   async getByConversationId(
     conversationId: string
   ): Promise<MessageWithExcerpts[]> {
@@ -79,7 +81,7 @@ export const messageService = {
       .where(eq(messages.conversationId, conversationId))
       .orderBy(messages.createdAt, excerpts.order);
 
-    // Group messages and their excerpts together
+    // Group excerpts under their parent messages (handles 1-to-many relationship)
     const messageMap = new Map<string, MessageWithExcerpts>();
 
     result.forEach(row => {
@@ -92,7 +94,7 @@ export const messageService = {
         });
       }
 
-      // Add excerpt if it exists
+      // Add excerpt if it exists (left join can return null excerpts)
       if (row.excerpt) {
         messageMap.get(messageId)!.excerpts.push(row.excerpt);
       }
@@ -101,17 +103,17 @@ export const messageService = {
     return Array.from(messageMap.values());
   },
 
-  // Format messages for UI consumption
+  // Transform database format to UI format for React components
   formatMessagesForUI(messages: MessageWithExcerpts[]): FormattedMessage[] {
     return messages.map(msg => ({
       id: msg.id,
       role: msg.role as MessageRole,
-      text: msg.content,
+      text: msg.content, // Map 'content' field to 'text' for UI consistency
       excerpts: msg.excerpts,
     }));
   },
 
-  // Get a message by ID
+  // Single message lookup (used for editing and validation)
   async getById(id: string): Promise<Message | undefined> {
     const [message] = await db
       .select()
@@ -120,13 +122,12 @@ export const messageService = {
     return message;
   },
 
-  // Delete a message (cascade deletes are handled by database constraints)
+  // Delete message and all related excerpts (foreign key cascade handles cleanup)
   async delete(id: string): Promise<void> {
-    // The database will automatically cascade delete all excerpts for this message
     await db.delete(messages).where(eq(messages.id, id));
   },
 
-  // Update a message
+  // Update message content (typically used for editing user messages)
   async update(id: string, data: Partial<NewMessage>): Promise<Message> {
     const [message] = await db
       .update(messages)

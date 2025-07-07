@@ -5,7 +5,7 @@ import { env } from '@/lib/env';
 import type { FormattedMessage } from './message.service';
 import { OPENAI_CONFIG, ERROR_MESSAGES } from '@/constants';
 
-// Schema definitions for OpenAI structured outputs
+// Schema for structured AI advice - ensures consistent output format
 const ListItem = z.object({
   title: z.string(),
   content: z.string(),
@@ -19,22 +19,23 @@ const AdviceList = z.object({
 export type ListItemType = z.infer<typeof ListItem>;
 export type AdviceListType = z.infer<typeof AdviceList>;
 
+// OpenAI API request format - simplified conversation structure
 export interface AiRequestInput {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
+// OpenAI structured response - guarantees parseable advice format
 export interface AiResponseStructured {
   output_parsed: AdviceListType;
 }
 
-// OpenAI client instance (server-side only)
+// OpenAI client instance (server-side only - API key required)
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
+// LLM service - manages AI conversation processing and response structuring
 export const llmService = {
-  /**
-   * Generate AI response from conversation messages (server-side only)
-   */
+  // Generate structured AI advice from conversation context
   async generateResponse(
     messages: AiRequestInput[]
   ): Promise<AiResponseStructured> {
@@ -48,6 +49,7 @@ export const llmService = {
         throw new Error(ERROR_MESSAGES.INVALID_MESSAGE_FORMAT);
       }
 
+      // Use OpenAI's structured output to guarantee parseable advice format
       const response = await openai.responses.parse({
         model: OPENAI_CONFIG.DEFAULT_MODEL,
         input: [
@@ -66,9 +68,7 @@ export const llmService = {
     }
   },
 
-  /**
-   * Build conversation context from existing messages (utility function)
-   */
+  // Extract user messages for AI context (filters out assistant responses to avoid confusion)
   buildConversationContext(
     existingMessages: FormattedMessage[]
   ): AiRequestInput[] {
@@ -80,9 +80,7 @@ export const llmService = {
       }));
   },
 
-  /**
-   * Create a complete conversation request with new user message (utility function)
-   */
+  // Create complete conversation payload including historical context and new message
   createConversationRequest(
     existingMessages: FormattedMessage[],
     newUserMessage: string

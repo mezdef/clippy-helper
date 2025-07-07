@@ -1,7 +1,7 @@
 import { API_CONFIG, ERROR_MESSAGES } from '@/constants';
 
 /**
- * Configuration options for API requests
+ * Request configuration for all API calls - standardizes timeout and headers
  * @interface ApiRequestOptions
  */
 export interface ApiRequestOptions {
@@ -16,8 +16,7 @@ export interface ApiRequestOptions {
 }
 
 /**
- * Generic API request function with error handling
- * Provides consistent error handling and response parsing
+ * Core API request handler with timeout protection and consistent error handling
  * @param url - The API endpoint URL
  * @param options - Request configuration options
  * @returns Promise resolving to parsed response data
@@ -46,6 +45,9 @@ export async function apiRequest<T = unknown>(
   };
 
   try {
+    /**
+     * Implement timeout protection to prevent hanging requests
+     */
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -57,6 +59,9 @@ export async function apiRequest<T = unknown>(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      /**
+       * Try to extract error details from response, fallback to HTTP status
+       */
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
         errorData.error ||
@@ -78,7 +83,7 @@ export async function apiRequest<T = unknown>(
 }
 
 /**
- * GET request helper function
+ * GET helper - for data retrieval operations
  * @param url - The API endpoint URL
  * @param options - Additional request options
  * @returns Promise resolving to parsed response data
@@ -91,7 +96,7 @@ export async function get<T = unknown>(
 }
 
 /**
- * POST request helper function
+ * POST helper - for creating new resources
  * @param url - The API endpoint URL
  * @param data - Request body data
  * @param options - Additional request options
@@ -106,7 +111,7 @@ export async function post<T = unknown>(
 }
 
 /**
- * PUT request helper function
+ * PUT helper - for full resource updates
  * @param url - The API endpoint URL
  * @param data - Request body data
  * @param options - Additional request options
@@ -121,7 +126,7 @@ export async function put<T = unknown>(
 }
 
 /**
- * DELETE request helper function
+ * DELETE helper - for resource removal
  * @param url - The API endpoint URL
  * @param options - Additional request options
  * @returns Promise resolving to parsed response data
@@ -134,7 +139,7 @@ export async function del<T = unknown>(
 }
 
 /**
- * PATCH request helper function
+ * PATCH helper - for partial resource updates
  * @param url - The API endpoint URL
  * @param data - Request body data
  * @param options - Additional request options
@@ -149,7 +154,7 @@ export async function patch<T = unknown>(
 }
 
 /**
- * Helper function to handle API errors consistently
+ * Standardize error handling across the application
  * @param error - The error object
  * @returns Formatted error message
  */
@@ -166,7 +171,7 @@ export function handleApiError(error: unknown): string {
 }
 
 /**
- * Helper function to check if a response indicates success
+ * Quick success check for API responses
  * @param response - The API response
  * @returns Boolean indicating success
  */
@@ -175,7 +180,7 @@ export function isSuccessResponse(response: { error?: string }): boolean {
 }
 
 /**
- * Helper function to extract error message from API response
+ * Extract error message from various API response formats
  * @param response - The API response
  * @returns Error message or null if no error
  */

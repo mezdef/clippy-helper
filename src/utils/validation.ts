@@ -1,51 +1,42 @@
 import { VALIDATION_RULES } from '@/constants';
 
-/**
- * Validation result interface
- * @interface ValidationResult
- */
+// Standardized validation result - consistent interface for all validation functions
 export interface ValidationResult {
   isValid: boolean;
   error?: string;
 }
 
-/**
- * Validates message content
- * @param content - The message content to validate
- * @returns Validation result with success status and optional error message
- */
-export function validateMessageContent(content: string): ValidationResult {
+// Validate message content against business rules (prevents empty spam and enforces limits)
+export function validateMessage(content: string): ValidationResult {
   if (!content || typeof content !== 'string') {
+    return { isValid: false, error: 'Message content is required' };
+  }
+
+  const trimmed = content.trim();
+
+  if (trimmed.length === 0) {
+    return { isValid: false, error: 'Message cannot be empty' };
+  }
+
+  if (trimmed.length < VALIDATION_RULES.MIN_MESSAGE_LENGTH) {
     return {
       isValid: false,
-      error: 'Message content is required',
+      error: `Message must be at least ${VALIDATION_RULES.MIN_MESSAGE_LENGTH} characters`,
     };
   }
 
-  const trimmedContent = content.trim();
-
-  if (trimmedContent.length < VALIDATION_RULES.MIN_MESSAGE_LENGTH) {
+  // Prevent extremely long messages that could cause performance issues
+  if (trimmed.length > VALIDATION_RULES.MAX_MESSAGE_LENGTH) {
     return {
       isValid: false,
-      error: 'Message content cannot be empty',
-    };
-  }
-
-  if (trimmedContent.length > VALIDATION_RULES.MAX_MESSAGE_LENGTH) {
-    return {
-      isValid: false,
-      error: `Message content cannot exceed ${VALIDATION_RULES.MAX_MESSAGE_LENGTH} characters`,
+      error: `Message must be no more than ${VALIDATION_RULES.MAX_MESSAGE_LENGTH} characters`,
     };
   }
 
   return { isValid: true };
 }
 
-/**
- * Validates conversation title
- * @param title - The conversation title to validate
- * @returns Validation result with success status and optional error message
- */
+// Validate conversation titles for UI display and database storage
 export function validateConversationTitle(title: string): ValidationResult {
   if (!title || typeof title !== 'string') {
     return {
@@ -63,6 +54,7 @@ export function validateConversationTitle(title: string): ValidationResult {
     };
   }
 
+  // Prevent titles that are too long for UI display
   if (trimmedTitle.length > VALIDATION_RULES.MAX_TITLE_LENGTH) {
     return {
       isValid: false,
@@ -73,11 +65,7 @@ export function validateConversationTitle(title: string): ValidationResult {
   return { isValid: true };
 }
 
-/**
- * Validates excerpt title
- * @param title - The excerpt title to validate
- * @returns Validation result with success status and optional error message
- */
+// Validate excerpt titles for advice organization
 export function validateExcerptTitle(title: string): ValidationResult {
   if (!title || typeof title !== 'string') {
     return {
@@ -95,6 +83,7 @@ export function validateExcerptTitle(title: string): ValidationResult {
     };
   }
 
+  // Keep excerpt titles concise for better UX
   if (trimmedTitle.length > VALIDATION_RULES.MAX_EXCERPT_TITLE_LENGTH) {
     return {
       isValid: false,
@@ -105,11 +94,7 @@ export function validateExcerptTitle(title: string): ValidationResult {
   return { isValid: true };
 }
 
-/**
- * Validates excerpt content
- * @param content - The excerpt content to validate
- * @returns Validation result with success status and optional error message
- */
+// Validate excerpt content for AI advice storage
 export function validateExcerptContent(content: string): ValidationResult {
   if (!content || typeof content !== 'string') {
     return {
@@ -127,6 +112,7 @@ export function validateExcerptContent(content: string): ValidationResult {
     };
   }
 
+  // Prevent extremely long excerpts that hurt readability
   if (trimmedContent.length > VALIDATION_RULES.MAX_EXCERPT_CONTENT_LENGTH) {
     return {
       isValid: false,
@@ -137,11 +123,7 @@ export function validateExcerptContent(content: string): ValidationResult {
   return { isValid: true };
 }
 
-/**
- * Validates UUID format
- * @param uuid - The UUID string to validate
- * @returns Validation result with success status and optional error message
- */
+// Validate UUID format for database relationships
 export function validateUUID(uuid: string): ValidationResult {
   if (!uuid || typeof uuid !== 'string') {
     return {
@@ -150,6 +132,7 @@ export function validateUUID(uuid: string): ValidationResult {
     };
   }
 
+  // Standard UUID v4 format check
   const uuidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -163,11 +146,7 @@ export function validateUUID(uuid: string): ValidationResult {
   return { isValid: true };
 }
 
-/**
- * Validates email format
- * @param email - The email string to validate
- * @returns Validation result with success status and optional error message
- */
+// Basic email format validation (not comprehensive, use server-side validation for security)
 export function validateEmail(email: string): ValidationResult {
   if (!email || typeof email !== 'string') {
     return {
@@ -176,6 +155,7 @@ export function validateEmail(email: string): ValidationResult {
     };
   }
 
+  // Basic email pattern - server should do comprehensive validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email)) {
@@ -188,12 +168,7 @@ export function validateEmail(email: string): ValidationResult {
   return { isValid: true };
 }
 
-/**
- * Validates that a value is not empty
- * @param value - The value to validate
- * @param fieldName - The name of the field being validated
- * @returns Validation result with success status and optional error message
- */
+// Generic required field validation for forms
 export function validateRequired(
   value: unknown,
   fieldName: string
@@ -215,24 +190,35 @@ export function validateRequired(
   return { isValid: true };
 }
 
-/**
- * Validates multiple validation results
- * @param results - Array of validation results to check
- * @returns Combined validation result with all error messages
- */
+// Validate multiple fields and return first error (fail-fast approach)
 export function validateMultiple(
   results: ValidationResult[]
 ): ValidationResult {
-  const errors = results
-    .filter(result => !result.isValid)
-    .map(result => result.error)
-    .filter(Boolean);
+  for (const result of results) {
+    if (!result.isValid) {
+      return result;
+    }
+  }
 
-  if (errors.length > 0) {
-    return {
-      isValid: false,
-      error: errors.join(', '),
-    };
+  return { isValid: true };
+}
+
+// Type-safe form validation with custom rules per field
+export function validateFormData<T extends Record<string, unknown>>(
+  data: T,
+  rules: Record<keyof T, (value: T[keyof T]) => ValidationResult>
+): ValidationResult {
+  for (const [field, rule] of Object.entries(rules) as [
+    keyof T,
+    (value: T[keyof T]) => ValidationResult,
+  ][]) {
+    const result = rule(data[field]);
+    if (!result.isValid) {
+      return {
+        isValid: false,
+        error: `${String(field)}: ${result.error}`,
+      };
+    }
   }
 
   return { isValid: true };

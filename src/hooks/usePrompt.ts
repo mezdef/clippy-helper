@@ -30,6 +30,7 @@ interface UsePromptReturn {
   isSubmitting: boolean;
 }
 
+// Hook for managing AI conversation flow, message editing, and form state
 export const usePrompt = ({
   conversationId,
 }: UsePromptProps): UsePromptReturn => {
@@ -44,9 +45,7 @@ export const usePrompt = ({
   const { setIsSubmitting, setIsEditingMessage, isSubmitting } = useAppState();
   const promptFormRef = useRef<PromptFormRef | null>(null);
 
-  /**
-   * Build conversation context from existing messages
-   */
+  // Extract only user messages for AI context (avoids including previous AI responses)
   const buildConversationContext = (
     existingMessages: FormattedMessage[]
   ): AiRequestInput[] => {
@@ -58,9 +57,7 @@ export const usePrompt = ({
       }));
   };
 
-  /**
-   * Create a complete conversation request with new user message
-   */
+  // Prepare full conversation payload for AI including historical context
   const createConversationRequest = (
     existingMessages: FormattedMessage[],
     newUserMessage: string
@@ -76,9 +73,7 @@ export const usePrompt = ({
     ];
   };
 
-  /**
-   * Send request to LLM API
-   */
+  // Send conversation to AI service and get structured advice response
   const sendPromptRequest = async (
     aiRequests: AiRequestInput[]
   ): Promise<AiResponseStructured> => {
@@ -89,6 +84,8 @@ export const usePrompt = ({
       throw new Error(ERROR_MESSAGES.AI_RESPONSE_FAILED);
     }
   };
+
+  // Access cached messages from React Query (avoids unnecessary re-fetches)
   const getCurrentMessages = (): FormattedMessage[] => {
     return (
       (queryClient.getQueryData([
@@ -97,6 +94,8 @@ export const usePrompt = ({
       ]) as FormattedMessage[]) || []
     );
   };
+
+  // Remove messages from a specific point onwards (used for conversation branching)
   const deleteMessagesFromIndex = async (
     messages: FormattedMessage[],
     fromIndex: number
@@ -111,6 +110,7 @@ export const usePrompt = ({
     }
   };
 
+  // Store user message in database and update cache
   const createUserMessage = async (content: string): Promise<void> => {
     await createMessageMutation.mutateAsync({
       conversationId,
@@ -121,6 +121,7 @@ export const usePrompt = ({
     });
   };
 
+  // Store AI response with structured excerpts in database
   const createAssistantMessage = async (
     aiResponse: AiResponseStructured
   ): Promise<void> => {
@@ -133,6 +134,8 @@ export const usePrompt = ({
       } satisfies MessageCreateData,
     });
   };
+
+  // Edit message and regenerate conversation from that point (creates new conversation branch)
   const handleEditMessage = async (
     text: string,
     messageId: string
@@ -145,20 +148,20 @@ export const usePrompt = ({
         msg => msg.id === messageId
       );
 
-      // Delete all messages from the edited message onwards
+      // Remove all messages from the edited point onwards (conversation branching)
       if (messageIndex !== -1) {
         await deleteMessagesFromIndex(currentMessages, messageIndex);
       }
 
-      // Create new user message
+      // Create new user message with edited text
       await createUserMessage(text);
 
-      // Get updated messages and generate AI response
+      // Generate fresh AI response based on new conversation state
       const updatedMessages = getCurrentMessages();
       const aiRequests = createConversationRequest(updatedMessages, text);
       const aiResponse = await sendPromptRequest(aiRequests);
 
-      // Create AI response message
+      // Store the new AI response
       await createAssistantMessage(aiResponse);
     } catch (error) {
       console.error('Error in message editing:', error);
@@ -168,14 +171,15 @@ export const usePrompt = ({
     }
   };
 
+  // Handle new prompt submission - creates user message and generates AI response
   const onSubmit = async (data: PromptFormData): Promise<void> => {
     setIsSubmitting(true);
 
     try {
-      // Create user message
+      // Store user's prompt
       await createUserMessage(data.prompt);
 
-      // Get current messages and generate AI response
+      // Get conversation context and generate AI response
       const currentMessages = getCurrentMessages();
       const aiRequests = createConversationRequest(
         currentMessages,
@@ -183,7 +187,7 @@ export const usePrompt = ({
       );
       const aiResponse = await sendPromptRequest(aiRequests);
 
-      // Create AI response message
+      // Store AI response with structured excerpts
       await createAssistantMessage(aiResponse);
     } catch (error) {
       console.error('Error in prompt submission:', error);
