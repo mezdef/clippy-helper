@@ -5,9 +5,12 @@ import React, {
   ReactNode,
   useImperativeHandle,
   forwardRef,
+  useCallback,
 } from 'react';
-import { MessagesSquare, X } from 'lucide-react';
+import { MessagesSquare, X, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useSidebar } from '@/hooks/useSidebar';
+import { useCreateConversation } from '@/hooks/useConversations';
 import { Button } from '@/components/ui';
 
 interface SidebarMenuProps {
@@ -37,8 +40,23 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
     },
     ref
   ) => {
+    const router = useRouter();
     const { isOpen, closeSidebar, toggleSidebar, isLoading } =
       useSidebar(sidebarId);
+    const createConversationMutation = useCreateConversation();
+
+    const handleNewConversation = useCallback(async () => {
+      try {
+        const newConversation = await createConversationMutation.mutateAsync(
+          `Chat ${new Date().toLocaleString()}`
+        );
+        router.push(`/conversations/${newConversation.id}`);
+        closeSidebar();
+        onClose?.();
+      } catch (error) {
+        console.error('Error creating conversation:', error);
+      }
+    }, [createConversationMutation, router, closeSidebar, onClose]);
 
     // Expose close function to parent component
     useImperativeHandle(ref, () => ({
@@ -72,9 +90,9 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
           onClick={toggleSidebar}
           disabled={isLoading}
           icon={MessagesSquare}
-          variant="outline"
+          variant="default"
           size="md"
-          className="fixed top-4 left-4 z-40"
+          className="fixed top-4 left-4 z-40 w-10 h-10 p-0"
           title={triggerButtonTitle}
         />
 
@@ -92,9 +110,16 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
         >
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {title}
-              </h2>
+              <Button
+                onClick={handleNewConversation}
+                disabled={createConversationMutation.isPending}
+                icon={createConversationMutation.isPending ? undefined : Plus}
+                variant="default"
+                size="md"
+                loading={createConversationMutation.isPending}
+              >
+                New Conversation
+              </Button>
               <Button
                 onClick={handleClose}
                 disabled={isLoading}
@@ -105,7 +130,17 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
               />
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">{children}</div>
+            <div className="flex-1 overflow-y-auto p-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                {title}
+              </h2>
+              {createConversationMutation.error && (
+                <div className="mb-4 p-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded">
+                  {createConversationMutation.error.message}
+                </div>
+              )}
+              {children}
+            </div>
           </div>
         </div>
       </>

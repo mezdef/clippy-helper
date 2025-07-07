@@ -1,22 +1,27 @@
 'use client';
-import React, { JSX } from 'react';
-import { MessageSquare, Menu } from 'lucide-react';
+import React, { JSX, useCallback } from 'react';
+import { MessageSquare, MessagesSquare, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui';
+import { useCreateConversation } from '@/hooks/useConversations';
 
 const HomeContent: React.FC = (): JSX.Element => {
+  const router = useRouter();
+  const createConversationMutation = useCreateConversation();
+
+  const handleNewConversation = useCallback(async () => {
+    try {
+      const newConversation = await createConversationMutation.mutateAsync(
+        `Chat ${new Date().toLocaleString()}`
+      );
+      router.push(`/conversations/${newConversation.id}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
+  }, [createConversationMutation, router]);
+
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Clippy Helper
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            AI-powered writing assistant
-          </p>
-        </div>
-      </header>
-
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-6">
@@ -24,14 +29,30 @@ const HomeContent: React.FC = (): JSX.Element => {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
               Welcome to Clippy Helper
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">
-              Your AI-powered writing assistant. Click the menu button in the
-              top-left to start a new conversation.
-            </p>
+            <div className="mb-6">
+              <Button
+                onClick={handleNewConversation}
+                disabled={createConversationMutation.isPending}
+                icon={createConversationMutation.isPending ? undefined : Plus}
+                variant="outline"
+                size="lg"
+                loading={createConversationMutation.isPending}
+                className="w-full max-w-xs"
+              >
+                Start New Conversation
+              </Button>
+            </div>
+
+            {createConversationMutation.error && (
+              <div className="mb-6 p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-md">
+                {createConversationMutation.error.message}
+              </div>
+            )}
+
             <div className="flex items-center justify-center text-gray-500 dark:text-gray-400">
-              <Menu className="h-4 w-4 mr-2" />
+              <MessagesSquare className="h-4 w-4 mr-2" />
               <span className="text-sm">
-                Use the sidebar menu to get started
+                Or use the sidebar menu to browse existing conversations
               </span>
             </div>
           </div>

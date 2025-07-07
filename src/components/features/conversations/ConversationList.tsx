@@ -1,23 +1,17 @@
 'use client';
 import React, { JSX, forwardRef, useCallback } from 'react';
-import { Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LoadingSpinner } from '@/components/ui/loading';
-import { Button } from '@/components/ui';
 import {
   useConversations,
-  useCreateConversation,
   useDeleteConversation,
 } from '@/hooks/useConversations';
 import { ConversationItem } from './ConversationItem';
 import type { SidebarMenuRef } from '@/components/layout';
-import type { Conversation } from '@/db/schema';
 
 interface ConversationListProps {
-  onNewConversation?: () => void;
   onConversationClick?: (conversationId: string) => void;
   onDeleteConversation?: (conversationId: string) => void;
-  showNewButton?: boolean;
   className?: string;
   sidebarRef?: React.RefObject<SidebarMenuRef>;
 }
@@ -27,40 +21,19 @@ const ConversationListComponent = forwardRef<
   ConversationListProps
 >(
   (
-    {
-      onNewConversation,
-      onConversationClick,
-      onDeleteConversation,
-      showNewButton = true,
-      className = '',
-      sidebarRef,
-    },
+    { onConversationClick, onDeleteConversation, className = '', sidebarRef },
     ref
   ): JSX.Element => {
     const router = useRouter();
     const pathname = usePathname();
 
     const { data: conversations = [], isLoading, error } = useConversations();
-    const createConversationMutation = useCreateConversation();
     const deleteConversationMutation = useDeleteConversation();
 
     // Extract conversation ID from current pathname
     const activeConversationId = pathname.startsWith('/conversations/')
       ? pathname.split('/')[2]
       : null;
-
-    const handleNewConversation = useCallback(async () => {
-      try {
-        const newConversation = await createConversationMutation.mutateAsync(
-          `Chat ${new Date().toLocaleString()}`
-        );
-        router.push(`/conversations/${newConversation.id}`);
-        sidebarRef?.current?.close();
-        onNewConversation?.();
-      } catch (error) {
-        console.error('Error creating conversation:', error);
-      }
-    }, [createConversationMutation, router, sidebarRef, onNewConversation]);
 
     const handleDeleteConversation = useCallback(
       async (id: string) => {
@@ -103,7 +76,7 @@ const ConversationListComponent = forwardRef<
       if (conversations.length === 0) {
         return (
           <p className="text-gray-500 dark:text-gray-400 text-sm">
-            No conversations yet. Start a new chat to save conversations.
+            No conversations yet. Click New Conversation above to start.
           </p>
         );
       }
@@ -134,25 +107,6 @@ const ConversationListComponent = forwardRef<
 
     return (
       <div ref={ref} className={className}>
-        {showNewButton && (
-          <div className="flex items-center justify-between mb-4">
-            <Button
-              onClick={handleNewConversation}
-              disabled={createConversationMutation.isPending}
-              icon={createConversationMutation.isPending ? undefined : Plus}
-              variant="ghost"
-              size="md"
-              loading={createConversationMutation.isPending}
-            >
-              New Conversation
-            </Button>
-          </div>
-        )}
-        {createConversationMutation.error && (
-          <div className="mb-4 p-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded">
-            {createConversationMutation.error.message}
-          </div>
-        )}
         {renderConversationList()}
       </div>
     );

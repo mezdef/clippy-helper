@@ -57,7 +57,7 @@ export const PromptForm = forwardRef<PromptFormRef, PromptFormProps>(
             <div className="flex-1">
               <Input
                 id="prompt"
-                placeholder="I'd like to write a letter..."
+                placeholder="I'd like some legal advice..."
                 className="rounded-r-none h-12 text-lg"
                 onFocus={onFocus}
               />
