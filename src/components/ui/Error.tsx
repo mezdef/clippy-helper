@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { AlertTriangle } from 'lucide-react';
 
 interface ErrorProps {
@@ -25,12 +26,12 @@ export const Error: React.FC<ErrorProps> = ({
         </h1>
         <p className="text-gray-600 dark:text-gray-400">{message}</p>
         {homeLinkText && (
-          <a
+          <Link
             href="/"
             className="inline-block mt-4 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             {homeLinkText}
-          </a>
+          </Link>
         )}
       </div>
     </div>

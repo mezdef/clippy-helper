@@ -1,5 +1,10 @@
-import React, { JSX } from "react";
-import { FormProvider, useFormContext, UseFormReturn, FieldValues } from "react-hook-form";
+import React, { JSX } from 'react';
+import {
+  FormProvider,
+  useFormContext,
+  UseFormReturn,
+  FieldValues,
+} from 'react-hook-form';
 
 interface FormProps<T extends FieldValues> {
   onSubmit: (data: T) => void;
@@ -8,18 +13,38 @@ interface FormProps<T extends FieldValues> {
   methods?: UseFormReturn<T>;
 }
 
-export function Form<T extends FieldValues>({ onSubmit, className, children, methods }: FormProps<T>): JSX.Element {
-  if (methods) {
-    return (
-      <FormProvider {...methods}>
-        <Form onSubmit={onSubmit} className={className}>{children}</Form>
-      </FormProvider>
-    );
-  }
+function FormContent<T extends FieldValues>({
+  onSubmit,
+  className,
+  children,
+}: Omit<FormProps<T>, 'methods'>): JSX.Element {
   const { handleSubmit } = useFormContext<T>();
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={className}>
       {children}
     </form>
   );
-} 
+}
+
+export function Form<T extends FieldValues>({
+  onSubmit,
+  className,
+  children,
+  methods,
+}: FormProps<T>): JSX.Element {
+  if (methods) {
+    return (
+      <FormProvider {...methods}>
+        <FormContent onSubmit={onSubmit} className={className}>
+          {children}
+        </FormContent>
+      </FormProvider>
+    );
+  }
+
+  return (
+    <FormContent onSubmit={onSubmit} className={className}>
+      {children}
+    </FormContent>
+  );
+}
