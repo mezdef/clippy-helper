@@ -8,7 +8,7 @@ export const API_CONFIG = {
 // API endpoint configuration - centralizes all backend routes
 export const API_ENDPOINTS = {
   HEALTH: '/api/health',
-  LLM: '/api/chat',
+  LLM: '/api/llm',
   CONVERSATIONS: '/api/conversations',
   CONVERSATION_BY_ID: (id: string) => `/api/conversations/${id}`,
   MESSAGES: (conversationId: string) =>
