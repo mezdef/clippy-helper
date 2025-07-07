@@ -3,7 +3,6 @@ import React, { JSX } from 'react';
 import { Edit2, X } from 'lucide-react';
 import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar, Button } from '@/components/ui';
-import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
 import { EditMessageForm } from './EditMessageForm';
 import type { MessageRole, EditingStateProps } from '@/types';
 
@@ -32,35 +31,12 @@ export const Message: React.FC<MessageProps> = ({
   // Check if this message is being edited
   const isEditing =
     editingItem?.type === 'message' && editingItem?.id === messageId;
-  const updateExcerptMutation = useUpdateExcerpt();
-  const deleteExcerptMutation = useDeleteExcerpt();
 
   const isUser = role === 'user';
   const padding = isUser ? 'p-4' : 'p-0';
   const bgColor = isUser
     ? 'bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100'
     : 'bg-transparent';
-  const borderColor = isUser ? 'border-green-500' : 'border-blue-500';
-
-  const handleEditExcerpt = async (
-    id: string,
-    content: string,
-    title: string
-  ) => {
-    try {
-      await updateExcerptMutation.mutateAsync({ id, content, title });
-    } catch (error) {
-      console.error('Error updating excerpt:', error);
-    }
-  };
-
-  const handleDeleteExcerpt = async (id: string) => {
-    try {
-      await deleteExcerptMutation.mutateAsync(id);
-    } catch (error) {
-      console.error('Error deleting excerpt:', error);
-    }
-  };
 
   const handleEditSave = async (editedText: string) => {
     await onEditMessage?.(editedText, messageId!);
@@ -79,7 +55,7 @@ export const Message: React.FC<MessageProps> = ({
 
       <div className={`w-full ${bgColor} ${padding} rounded-lg`}>
         <div className="space-y-3">
-          {/* Display text content or edit form */}
+          {/* Display text content or edit form for user messages */}
           {isUser && text && (
             <>
               {isEditing ? (
@@ -98,12 +74,10 @@ export const Message: React.FC<MessageProps> = ({
             </>
           )}
 
+          {/* Display excerpts for assistant messages */}
           {!isUser && excerpts.length > 0 && (
             <ExcerptsList
               excerpts={excerpts}
-              borderColor={borderColor}
-              onEditExcerpt={handleEditExcerpt}
-              onDeleteExcerpt={handleDeleteExcerpt}
               editingItem={editingItem}
               setEditingItem={setEditingItem}
             />
