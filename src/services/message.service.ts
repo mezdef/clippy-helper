@@ -27,23 +27,19 @@ export const messageService = {
   ): Promise<MessageWithExcerpts> {
     const { aiResponse, ...messageData } = data;
 
-    // Use transaction to ensure data consistency
-    return await db.transaction(async tx => {
-      // Create the message
-      const [message] = await tx
-        .insert(messages)
-        .values(messageData)
-        .returning();
+    // Create the message first
+    const [message] = await db.insert(messages).values(messageData).returning();
 
-      // Save excerpts if this is an AI response with structured content
-      let messageExcerpts: Excerpt[] = [];
-      if (aiResponse && messageData.role === 'assistant') {
-        // Create excerpts within the same transaction
-        if (
-          aiResponse?.list &&
-          Array.isArray(aiResponse.list) &&
-          aiResponse.list.length > 0
-        ) {
+    // Save excerpts if this is an AI response with structured content
+    let messageExcerpts: Excerpt[] = [];
+    if (aiResponse && messageData.role === 'assistant') {
+      // Create excerpts after message creation
+      if (
+        aiResponse?.list &&
+        Array.isArray(aiResponse.list) &&
+        aiResponse.list.length > 0
+      ) {
+        try {
           const excerptData = aiResponse.list.map((item, index) => ({
             messageId: message.id,
             title: item.title,
@@ -51,18 +47,22 @@ export const messageService = {
             order: index.toString(),
           }));
 
-          messageExcerpts = await tx
+          messageExcerpts = await db
             .insert(excerpts)
             .values(excerptData)
             .returning();
+        } catch (excerptError) {
+          // If excerpt creation fails, log the error but don't fail the entire operation
+          // The message will still be created, just without excerpts
+          console.error('Failed to create excerpts:', excerptError);
         }
       }
+    }
 
-      return {
-        ...message,
-        excerpts: messageExcerpts,
-      };
-    });
+    return {
+      ...message,
+      excerpts: messageExcerpts,
+    };
   },
 
   // Get messages for a conversation with excerpts
