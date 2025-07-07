@@ -6,12 +6,7 @@ export async function GET() {
     const health = await runHealthChecks();
 
     // Set appropriate HTTP status based on health
-    const status =
-      health.overall === 'healthy'
-        ? 200
-        : health.overall === 'degraded'
-          ? 200
-          : 503;
+    const status = health.overall === 'healthy' ? 200 : 503;
 
     return NextResponse.json(health, { status });
   } catch (error) {

@@ -12,7 +12,7 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   ...compat.extends('prettier'), // Disable ESLint rules that conflict with Prettier
-  {
+  ...compat.config({
     plugins: ['prettier', '@typescript-eslint'],
     rules: {
       // Prettier integration
@@ -27,14 +27,26 @@ const eslintConfig = [
       'array-bracket-spacing': 'off',
       'comma-spacing': 'off',
       'key-spacing': 'off',
-      // Disallow explicit any
+
+      // TypeScript specific rules
       '@typescript-eslint/no-explicit-any': 'error',
-      // Require explicit return types on module boundaries
       '@typescript-eslint/explicit-module-boundary-types': 'error',
-      // Disallow unused exports
-      'no-unused-exports': 'error',
+
+      // Unused code rules - error on all unused code
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'no-unused-vars': 'off', // Turn off base rule as it conflicts with @typescript-eslint version
+
+      // Import/export rules
+      'no-unused-private-class-members': 'error',
     },
-  },
+  }),
 ];
 
 export default eslintConfig;
