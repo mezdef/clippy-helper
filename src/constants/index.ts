@@ -44,13 +44,6 @@ export const MESSAGE_ROLES = {
   SYSTEM: 'system',
 } as const;
 
-// Health monitoring status types
-export const HEALTH_STATUS = {
-  HEALTHY: 'healthy',
-  UNHEALTHY: 'unhealthy',
-  DEGRADED: 'degraded',
-} as const;
-
 // Standardized error messages - provides consistent user experience
 export const ERROR_MESSAGES = {
   GENERIC: 'An unexpected error occurred',
@@ -69,16 +62,6 @@ export const ERROR_MESSAGES = {
   INVALID_MESSAGE_FORMAT: 'Invalid message format',
   DATABASE_CONNECTION_FAILED: 'Database connection failed',
   ENV_VAR_MISSING: 'Required environment variable is missing',
-} as const;
-
-// Success messages for positive user feedback
-export const SUCCESS_MESSAGES = {
-  MESSAGE_CREATED: 'Message created successfully',
-  MESSAGE_UPDATED: 'Message updated successfully',
-  MESSAGE_DELETED: 'Message deleted successfully',
-  CONVERSATION_CREATED: 'Conversation created successfully',
-  CONVERSATION_UPDATED: 'Conversation updated successfully',
-  AI_RESPONSE_GENERATED: 'AI response generated successfully',
 } as const;
 
 // HTTP status codes - standardizes API response codes
@@ -104,14 +87,6 @@ export const OPENAI_CONFIG = {
   TEMPERATURE: 0.7,
 } as const;
 
-// UI configuration - optimizes user experience
-export const UI_CONFIG = {
-  DEFAULT_PAGE_SIZE: 20,
-  MAX_PAGE_SIZE: 100,
-  ANIMATION_DURATION: 300,
-  SEARCH_DEBOUNCE_DELAY: 300,
-} as const;
-
 // Validation rules - enforce data quality and prevent abuse
 export const VALIDATION_RULES = {
   MIN_MESSAGE_LENGTH: 1,
@@ -121,16 +96,4 @@ export const VALIDATION_RULES = {
   MIN_EXCERPT_TITLE_LENGTH: 1,
   MAX_EXCERPT_TITLE_LENGTH: 100,
   MAX_EXCERPT_CONTENT_LENGTH: 5000,
-} as const;
-
-// Database configuration - optimizes connection handling
-export const DATABASE_CONFIG = {
-  /** 30 second connection timeout - prevents hanging connections */
-  CONNECTION_TIMEOUT: 30000,
-  /** 10 second query timeout - prevents slow queries from blocking */
-  QUERY_TIMEOUT: 10000,
-  /** 10 max connections - balances performance with resource usage */
-  MAX_POOL_SIZE: 10,
-  /** 2 min connections - ensures some connections are always available */
-  MIN_POOL_SIZE: 2,
 } as const;

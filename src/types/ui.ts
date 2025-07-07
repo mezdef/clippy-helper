@@ -21,9 +21,3 @@ export interface EditingStateProps {
   editingItem?: EditingItem | null;
   setEditingItem?: (item: EditingItem | null) => void;
 }
-
-// Loading states for UI components
-export interface LoadingState {
-  isLoading: boolean;
-  error?: string | null;
-}

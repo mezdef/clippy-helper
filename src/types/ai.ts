@@ -25,13 +25,6 @@ export interface MessageCreateData {
   aiResponse?: AdviceList;
 }
 
-// Type for API responses
-export interface ApiResponse<T = unknown> {
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
 // Type for excerpt data
 export interface ExcerptData {
   id: string;
