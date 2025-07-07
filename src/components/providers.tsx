@@ -5,7 +5,11 @@ import { useState } from 'react';
 import { QUERY_CONFIG } from '@/constants';
 
 // Providers component that wraps the app with necessary context providers
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   const [queryClient] = useState(
     () =>
       new QueryClient({

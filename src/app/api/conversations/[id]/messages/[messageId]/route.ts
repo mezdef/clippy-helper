@@ -4,7 +4,7 @@ import { messageService } from '@/services';
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; messageId: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { messageId } = await params;
     const { content } = await req.json();
@@ -30,7 +30,7 @@ export async function PUT(
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; messageId: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { messageId } = await params;
 

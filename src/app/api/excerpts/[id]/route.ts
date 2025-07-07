@@ -1,10 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { excerptService } from '@/services';
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  try {
+    const { id } = await params;
+    const excerpt = await excerptService.getById(id);
+
+    if (!excerpt) {
+      return NextResponse.json({ error: 'Excerpt not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(excerpt);
+  } catch (error) {
+    console.error('Error fetching excerpt:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch excerpt' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     const { content, title } = await request.json();
@@ -37,7 +59,7 @@ export async function PUT(
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     await excerptService.delete(id);

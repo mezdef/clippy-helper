@@ -6,7 +6,10 @@ interface ErrorProps {
   reset: () => void;
 }
 
-export default function ConversationError({ error, reset }: ErrorProps) {
+export default function ConversationError({
+  error: _error,
+  reset: _reset,
+}: ErrorProps): React.ReactElement {
   return (
     <Error
       title="Something went wrong!"

@@ -4,7 +4,7 @@ import { conversationService } from '@/services';
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     const conversation = await conversationService.getByIdWithMessages(id);
@@ -29,7 +29,7 @@ export async function GET(
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     await conversationService.delete(id);

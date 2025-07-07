@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { conversationService } from '@/services';
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
   try {
     const conversations = await conversationService.getAll();
     return NextResponse.json(conversations);
@@ -14,7 +14,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { title } = await req.json();
 

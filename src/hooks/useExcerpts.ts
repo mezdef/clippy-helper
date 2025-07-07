@@ -1,10 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  UseMutationResult,
+} from '@tanstack/react-query';
 import { useAppState } from './useAppState';
 import type { FormattedMessage } from '@/services/message.service';
 import type { Excerpt } from '@/db/schema';
 
 // Update an excerpt
-export const useUpdateExcerpt = () => {
+export const useUpdateExcerpt = (): UseMutationResult<
+  Excerpt,
+  Error,
+  { id: string; content: string; title: string }
+> => {
   const queryClient = useQueryClient();
   const { clearEditingItem } = useAppState();
 
@@ -56,7 +64,7 @@ export const useUpdateExcerpt = () => {
 };
 
 // Delete an excerpt
-export const useDeleteExcerpt = () => {
+export const useDeleteExcerpt = (): UseMutationResult<void, Error, string> => {
   const queryClient = useQueryClient();
   const { clearEditingItem } = useAppState();
 

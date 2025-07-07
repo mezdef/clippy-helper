@@ -6,10 +6,14 @@ export default function ConversationLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}): React.ReactElement {
   return (
     <div className="flex flex-col h-screen">
-      <ErrorBoundary>{children}</ErrorBoundary>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingPage text="Loading..." />}>
+          {children}
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

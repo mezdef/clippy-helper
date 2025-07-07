@@ -6,7 +6,10 @@ interface ErrorPageProps {
   reset: () => void;
 }
 
-export default function ErrorPage({ error, reset }: ErrorPageProps) {
+export default function ErrorPage({
+  error: _error,
+  reset: _reset,
+}: ErrorPageProps): React.ReactElement {
   return (
     <Error
       title="Something went wrong"

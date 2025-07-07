@@ -16,7 +16,7 @@ export const excerptService = {
   async createMany(
     messageId: string,
     items: Array<{ title: string; content: string }>
-  ) {
+  ): Promise<NewExcerpt[]> {
     const excerptData = items.map((item, index) => ({
       messageId,
       title: item.title,
@@ -29,7 +29,10 @@ export const excerptService = {
   },
 
   // Save excerpts from AI response
-  async saveFromAiResponse(messageId: string, aiResponse: AdviceList) {
+  async saveFromAiResponse(
+    messageId: string,
+    aiResponse: AdviceList
+  ): Promise<NewExcerpt[]> {
     if (
       aiResponse?.list &&
       Array.isArray(aiResponse.list) &&
@@ -41,7 +44,7 @@ export const excerptService = {
   },
 
   // Get excerpts for a message
-  async getByMessageId(messageId: string) {
+  async getByMessageId(messageId: string): Promise<NewExcerpt[]> {
     return await db
       .select()
       .from(excerpts)
@@ -50,7 +53,7 @@ export const excerptService = {
   },
 
   // Get a single excerpt by ID
-  async getById(id: string) {
+  async getById(id: string): Promise<NewExcerpt | undefined> {
     const [excerpt] = await db
       .select()
       .from(excerpts)
@@ -59,17 +62,17 @@ export const excerptService = {
   },
 
   // Delete an excerpt
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     await db.delete(excerpts).where(eq(excerpts.id, id));
   },
 
   // Delete all excerpts for a message
-  async deleteByMessageId(messageId: string) {
+  async deleteByMessageId(messageId: string): Promise<void> {
     await db.delete(excerpts).where(eq(excerpts.messageId, messageId));
   },
 
   // Update an excerpt
-  async update(id: string, data: Partial<NewExcerpt>) {
+  async update(id: string, data: Partial<NewExcerpt>): Promise<NewExcerpt> {
     const [excerpt] = await db
       .update(excerpts)
       .set(data)

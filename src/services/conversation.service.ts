@@ -4,8 +4,13 @@ import {
   messages,
   excerpts,
   type NewConversation,
+  type MessageWithExcerpts,
 } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
+
+interface ConversationWithMessages extends NewConversation {
+  messages: MessageWithExcerpts[];
+}
 
 export const conversationService = {
   // Create a new conversation
@@ -18,7 +23,7 @@ export const conversationService = {
   },
 
   // Get all conversations
-  async getAll() {
+  async getAll(): Promise<NewConversation[]> {
     return await db
       .select()
       .from(conversations)
@@ -26,7 +31,7 @@ export const conversationService = {
   },
 
   // Get a conversation by ID
-  async getById(id: string) {
+  async getById(id: string): Promise<NewConversation | undefined> {
     const [conversation] = await db
       .select()
       .from(conversations)
@@ -35,7 +40,9 @@ export const conversationService = {
   },
 
   // Get a conversation by ID with associated messages and excerpts using joins
-  async getByIdWithMessages(id: string) {
+  async getByIdWithMessages(
+    id: string
+  ): Promise<ConversationWithMessages | null> {
     const result = await db
       .select({
         conversation: conversations,
@@ -85,7 +92,7 @@ export const conversationService = {
   },
 
   // Update conversation title
-  async updateTitle(id: string, title: string) {
+  async updateTitle(id: string, title: string): Promise<NewConversation> {
     const [conversation] = await db
       .update(conversations)
       .set({ title, updatedAt: new Date() })
@@ -95,7 +102,7 @@ export const conversationService = {
   },
 
   // Delete a conversation (cascade deletes are handled by database constraints)
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     // The database will automatically cascade delete:
     // 1. All messages in this conversation (via conversations -> messages FK)
     // 2. All excerpts from those messages (via messages -> excerpts FK)

@@ -31,8 +31,18 @@ const saveSidebarState = (state: SidebarState) => {
   }
 };
 
+interface UseSidebarReturn {
+  isOpen: boolean;
+  activeSidebar?: string;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+  toggleSidebar: () => void;
+  updateSidebar: (updates: Partial<SidebarState>) => void;
+  isLoading: boolean;
+}
+
 // Hook to manage sidebar state
-export const useSidebar = (sidebarId?: string) => {
+export const useSidebar = (sidebarId?: string): UseSidebarReturn => {
   const queryClient = useQueryClient();
 
   // Query for sidebar state

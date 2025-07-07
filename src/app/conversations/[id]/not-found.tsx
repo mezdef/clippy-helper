@@ -1,6 +1,6 @@
 import { Error } from '@/components/ui/Error';
 
-export default function NotFound() {
+export default function NotFound(): React.ReactElement {
   return (
     <Error
       title="Conversation not found"

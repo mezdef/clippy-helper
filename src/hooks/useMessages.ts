@@ -1,10 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  UseMutationResult,
+} from '@tanstack/react-query';
 import type { MessageWithExcerpts } from '@/db/schema';
 import type { FormattedMessage } from '@/services/message.service';
 import type { MessageCreateData, MessageRole } from '@/types';
 
 // Create a new message
-export const useCreateMessage = () => {
+export const useCreateMessage = (): UseMutationResult<
+  MessageWithExcerpts,
+  Error,
+  { conversationId: string; messageData: MessageCreateData }
+> => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -55,7 +63,11 @@ export const useCreateMessage = () => {
 };
 
 // Delete a message
-export const useDeleteMessage = () => {
+export const useDeleteMessage = (): UseMutationResult<
+  void,
+  Error,
+  { conversationId: string; messageId: string }
+> => {
   const queryClient = useQueryClient();
 
   return useMutation({
