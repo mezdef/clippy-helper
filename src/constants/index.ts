@@ -80,7 +80,7 @@ export const OPENAI_CONFIG = {
   /** GPT-4 model for high-quality advice generation */
   DEFAULT_MODEL: 'gpt-4o-2024-08-06',
   /** System prompt that ensures structured advice output */
-  ADVICE_SYSTEM_PROMPT: 'Provide advice as an unordered list.',
+  ADVICE_SYSTEM_PROMPT: 'Be friendly and conscise. Talk like a lawyer.',
   /** 2000 tokens max - balances response quality with cost */
   MAX_TOKENS: 2000,
   /** 0.7 temperature - creative but focused responses */
