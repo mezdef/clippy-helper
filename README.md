@@ -18,7 +18,7 @@ cp .env.example .env
 
 3. Add your OpenAI API key and database URL to the .env file (or copy in provided values)
 
-4. Push the database schema
+4. Push the database schema (required if the database hasn't already been setup)
 
 ```
 bun run db:push
@@ -31,6 +31,36 @@ bun run dev
 ```
 
 6. Visit `http://localhost:3000` to view the app.
+
+### 📋 Required Software
+
+**1. Node.js (v18 or higher)**
+
+- Download from [nodejs.org](https://nodejs.org/)
+- Verify installation: `node --version`
+
+**2. Bun (v1.0.0 or higher)**
+
+- Install via curl: `curl -fsSL https://bun.sh/install | bash`
+- Or via npm: `npm install -g bun`
+- Verify installation: `bun --version`
+
+**3. Git**
+
+- Download from [git-scm.com](https://git-scm.com/)
+- Verify installation: `git --version`
+
+**4. PostgreSQL Database**
+This project is developed assuming Neon Postgres. Configuration is done via the .env file.
+
+### Required API Keys
+
+**OpenAI API Key**
+Open AI API key is configured via the .env file.
+
+- Sign up at [platform.openai.com](https://platform.openai.com/)
+- Create an API key in your dashboard
+- Ensure you have credits/billing set up
 
 ## About the project
 
