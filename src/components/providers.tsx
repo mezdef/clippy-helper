@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
+import { QUERY_CONFIG } from '@/constants';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -10,14 +11,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 5, // 5 minutes
-            gcTime: 1000 * 60 * 10, // 10 minutes
+            staleTime: QUERY_CONFIG.DEFAULT_STALE_TIME,
+            gcTime: QUERY_CONFIG.DEFAULT_GC_TIME,
+            retry: QUERY_CONFIG.DEFAULT_RETRY_ATTEMPTS,
           },
         },
       })
   );
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      {/* Leaving tools commented out for now since they're annoying */}
+      {/*  <ReactQueryDevtools initialIsOpen={false} /> */}
+    </QueryClientProvider>
   );
 }

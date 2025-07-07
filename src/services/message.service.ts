@@ -66,7 +66,9 @@ export const messageService = {
   },
 
   // Get messages for a conversation with excerpts
-  async getByConversationId(conversationId: string) {
+  async getByConversationId(
+    conversationId: string
+  ): Promise<MessageWithExcerpts[]> {
     const result = await db
       .select({
         message: messages,
@@ -77,8 +79,8 @@ export const messageService = {
       .where(eq(messages.conversationId, conversationId))
       .orderBy(messages.createdAt, excerpts.order);
 
-    // Group messages and their excerpts
-    const messageMap = new Map();
+    // Group messages and their excerpts together
+    const messageMap = new Map<string, MessageWithExcerpts>();
 
     result.forEach(row => {
       const messageId = row.message.id;
@@ -92,7 +94,7 @@ export const messageService = {
 
       // Add excerpt if it exists
       if (row.excerpt) {
-        messageMap.get(messageId).excerpts.push(row.excerpt);
+        messageMap.get(messageId)!.excerpts.push(row.excerpt);
       }
     });
 
@@ -110,7 +112,7 @@ export const messageService = {
   },
 
   // Get a message by ID
-  async getById(id: string) {
+  async getById(id: string): Promise<Message | undefined> {
     const [message] = await db
       .select()
       .from(messages)
@@ -119,13 +121,13 @@ export const messageService = {
   },
 
   // Delete a message (cascade deletes are handled by database constraints)
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     // The database will automatically cascade delete all excerpts for this message
     await db.delete(messages).where(eq(messages.id, id));
   },
 
   // Update a message
-  async update(id: string, data: Partial<NewMessage>) {
+  async update(id: string, data: Partial<NewMessage>): Promise<Message> {
     const [message] = await db
       .update(messages)
       .set(data)

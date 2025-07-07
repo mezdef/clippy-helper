@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { messageService } from '@/services';
+import { HTTP_STATUS, ERROR_MESSAGES } from '@/constants';
 
 export async function GET(
   req: NextRequest,
@@ -7,14 +8,23 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: ERROR_MESSAGES.VALIDATION },
+        { status: HTTP_STATUS.BAD_REQUEST }
+      );
+    }
+
     const messages = await messageService.getByConversationId(id);
     const formattedMessages = messageService.formatMessagesForUI(messages);
-    return NextResponse.json(formattedMessages);
+
+    return NextResponse.json(formattedMessages, { status: HTTP_STATUS.OK });
   } catch (error) {
     console.error('Error fetching messages:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch messages' },
-      { status: 500 }
+      { error: ERROR_MESSAGES.SERVER_ERROR },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     );
   }
 }
@@ -25,12 +35,20 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: ERROR_MESSAGES.VALIDATION },
+        { status: HTTP_STATUS.BAD_REQUEST }
+      );
+    }
+
     const { role, content, aiResponse } = await req.json();
 
     if (!role || !content) {
       return NextResponse.json(
         { error: 'Role and content are required' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
@@ -41,12 +59,12 @@ export async function POST(
       aiResponse,
     });
 
-    return NextResponse.json(message, { status: 201 });
+    return NextResponse.json(message, { status: HTTP_STATUS.CREATED });
   } catch (error) {
     console.error('Error creating message:', error);
     return NextResponse.json(
-      { error: 'Failed to create message' },
-      { status: 500 }
+      { error: ERROR_MESSAGES.MESSAGE_CREATE_FAILED },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     );
   }
 }

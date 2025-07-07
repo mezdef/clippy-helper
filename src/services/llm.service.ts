@@ -3,8 +3,9 @@ import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import { env } from '@/lib/env';
 import type { FormattedMessage } from './message.service';
+import { OPENAI_CONFIG, ERROR_MESSAGES } from '@/constants';
 
-// Schema definitions
+// Schema definitions for OpenAI structured outputs
 const ListItem = z.object({
   title: z.string(),
   content: z.string(),
@@ -15,7 +16,6 @@ const AdviceList = z.object({
   list: z.array(ListItem),
 });
 
-// Types
 export type ListItemType = z.infer<typeof ListItem>;
 export type AdviceListType = z.infer<typeof AdviceList>;
 
@@ -24,7 +24,7 @@ export interface AiRequestInput {
   content: string;
 }
 
-export interface AiResponseStructured extends OpenAI.Responses.Response {
+export interface AiResponseStructured {
   output_parsed: AdviceListType;
 }
 
@@ -40,17 +40,18 @@ export const llmService = {
   ): Promise<AiResponseStructured> {
     try {
       if (!messages || messages.length === 0) {
-        throw new Error('No messages provided');
+        throw new Error(ERROR_MESSAGES.NO_MESSAGES_FOR_AI);
       }
 
-      if (typeof messages[messages.length - 1].content !== 'string') {
-        throw new Error('Invalid message format');
+      const lastMessage = messages[messages.length - 1];
+      if (typeof lastMessage.content !== 'string') {
+        throw new Error(ERROR_MESSAGES.INVALID_MESSAGE_FORMAT);
       }
 
       const response = await openai.responses.parse({
-        model: 'gpt-4o-2024-08-06',
+        model: OPENAI_CONFIG.DEFAULT_MODEL,
         input: [
-          { role: 'system', content: 'Provide advice as an unordered list.' },
+          { role: 'system', content: OPENAI_CONFIG.ADVICE_SYSTEM_PROMPT },
           ...messages,
         ],
         text: {

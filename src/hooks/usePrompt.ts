@@ -10,6 +10,13 @@ import type {
   AiRequestInput,
   AiResponseStructured,
 } from '@/services/llm.service';
+import {
+  API_ENDPOINTS,
+  ERROR_MESSAGES,
+  QUERY_KEYS,
+  MESSAGE_ROLES,
+} from '@/constants';
+import { post } from '@/utils/api';
 
 interface UsePromptProps {
   conversationId: string;
@@ -76,89 +83,86 @@ export const usePrompt = ({
     aiRequests: AiRequestInput[]
   ): Promise<AiResponseStructured> => {
     try {
-      const response = await fetch('/api/llm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(aiRequests),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || 'Unknown error');
-      }
-
-      return result;
+      return await post<AiResponseStructured>(API_ENDPOINTS.LLM, aiRequests);
     } catch (error) {
       console.error('Error sending prompt request:', error);
-      throw error;
+      throw new Error(ERROR_MESSAGES.AI_RESPONSE_FAILED);
+    }
+  };
+  const getCurrentMessages = (): FormattedMessage[] => {
+    return (
+      (queryClient.getQueryData([
+        QUERY_KEYS.MESSAGES,
+        conversationId,
+      ]) as FormattedMessage[]) || []
+    );
+  };
+  const deleteMessagesFromIndex = async (
+    messages: FormattedMessage[],
+    fromIndex: number
+  ): Promise<void> => {
+    const messagesToDelete = messages.slice(fromIndex);
+
+    for (const message of messagesToDelete) {
+      await deleteMessageMutation.mutateAsync({
+        conversationId,
+        messageId: message.id,
+      });
     }
   };
 
+  const createUserMessage = async (content: string): Promise<void> => {
+    await createMessageMutation.mutateAsync({
+      conversationId,
+      messageData: {
+        role: 'user' as const,
+        content,
+      } satisfies MessageCreateData,
+    });
+  };
+
+  const createAssistantMessage = async (
+    aiResponse: AiResponseStructured
+  ): Promise<void> => {
+    await createMessageMutation.mutateAsync({
+      conversationId,
+      messageData: {
+        role: 'assistant' as const,
+        content: JSON.stringify(aiResponse.output_parsed),
+        aiResponse: aiResponse.output_parsed,
+      } satisfies MessageCreateData,
+    });
+  };
   const handleEditMessage = async (
     text: string,
     messageId: string
   ): Promise<void> => {
     setIsEditingMessage(true);
-    try {
-      const currentMessages =
-        (queryClient.getQueryData([
-          'messages',
-          conversationId,
-        ]) as FormattedMessage[]) || [];
 
+    try {
+      const currentMessages = getCurrentMessages();
       const messageIndex = currentMessages.findIndex(
         msg => msg.id === messageId
       );
 
+      // Delete all messages from the edited message onwards
       if (messageIndex !== -1) {
-        const messagesToDelete = currentMessages.slice(messageIndex);
-
-        // Delete messages first
-        for (const message of messagesToDelete) {
-          await deleteMessageMutation.mutateAsync({
-            conversationId,
-            messageId: message.id,
-          });
-        }
+        await deleteMessagesFromIndex(currentMessages, messageIndex);
       }
 
-      // Save new user message to database
-      await createMessageMutation.mutateAsync({
-        conversationId,
-        messageData: {
-          role: 'user' as const,
-          content: text,
-        } satisfies MessageCreateData,
-      });
+      // Create new user message
+      await createUserMessage(text);
 
-      // Get existing messages to build AI request context
-      const existingMessages =
-        (queryClient.getQueryData([
-          'messages',
-          conversationId,
-        ]) as FormattedMessage[]) || [];
+      // Get updated messages and generate AI response
+      const updatedMessages = getCurrentMessages();
+      const aiRequests = createConversationRequest(updatedMessages, text);
+      const aiResponse = await sendPromptRequest(aiRequests);
 
-      // Create conversation request with new user message
-      const newAiRequests: AiRequestInput[] = createConversationRequest(
-        existingMessages,
-        text
-      );
-
-      // Get AI response
-      const result = await sendPromptRequest(newAiRequests);
-
-      // Save AI message to database with excerpts
-      await createMessageMutation.mutateAsync({
-        conversationId,
-        messageData: {
-          role: 'assistant' as const,
-          content: JSON.stringify(result.output_parsed),
-          aiResponse: result.output_parsed,
-        } satisfies MessageCreateData,
-      });
-    } catch (err) {
-      console.error('Error in direct re-ask:', err);
-      throw err;
+      // Create AI response message
+      await createAssistantMessage(aiResponse);
+    } catch (error) {
+      console.error('Error in message editing:', error);
+      throw error;
     } finally {
       setIsEditingMessage(false);
     }
@@ -166,44 +170,24 @@ export const usePrompt = ({
 
   const onSubmit = async (data: PromptFormData): Promise<void> => {
     setIsSubmitting(true);
+
     try {
-      // Save user message to database first
-      await createMessageMutation.mutateAsync({
-        conversationId,
-        messageData: {
-          role: 'user' as const,
-          content: data.prompt,
-        } satisfies MessageCreateData,
-      });
+      // Create user message
+      await createUserMessage(data.prompt);
 
-      // Get existing messages to build AI request context
-      const existingMessages =
-        (queryClient.getQueryData([
-          'messages',
-          conversationId,
-        ]) as FormattedMessage[]) || [];
-
-      // Create conversation request with new user message
-      const newAiRequests: AiRequestInput[] = createConversationRequest(
-        existingMessages,
+      // Get current messages and generate AI response
+      const currentMessages = getCurrentMessages();
+      const aiRequests = createConversationRequest(
+        currentMessages,
         data.prompt
       );
+      const aiResponse = await sendPromptRequest(aiRequests);
 
-      // Get AI response
-      const result = await sendPromptRequest(newAiRequests);
-
-      // Save AI message to database with excerpts
-      await createMessageMutation.mutateAsync({
-        conversationId,
-        messageData: {
-          role: 'assistant' as const,
-          content: JSON.stringify(result.output_parsed),
-          aiResponse: result.output_parsed,
-        } satisfies MessageCreateData,
-      });
-    } catch (err) {
-      console.error('Error in prompt submission:', err);
-      throw err;
+      // Create AI response message
+      await createAssistantMessage(aiResponse);
+    } catch (error) {
+      console.error('Error in prompt submission:', error);
+      throw error;
     } finally {
       setIsSubmitting(false);
       methods.reset();

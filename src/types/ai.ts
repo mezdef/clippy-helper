@@ -14,7 +14,8 @@ export interface AdviceList {
 // Type for AI response that matches what OpenAI returns
 export interface AiResponse {
   output_parsed: AdviceList;
-  [key: string]: unknown; // Allow for other OpenAI response properties
+  /** Allow for other OpenAI response properties */
+  [key: string]: unknown;
 }
 
 // Type for message data when creating messages
