@@ -3,13 +3,14 @@ import {
   useMutation,
   useQueryClient,
   UseMutationResult,
+  UseQueryResult,
 } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import type { Conversation } from '@/db/schema';
 import type { FormattedMessage } from '@/services/message.service';
 
 // Fetch all conversations
-export const useConversations = (): ReturnType<typeof useQuery> => {
+export const useConversations = (): UseQueryResult<Conversation[], Error> => {
   return useQuery({
     queryKey: ['conversations'],
     queryFn: async (): Promise<Conversation[]> => {

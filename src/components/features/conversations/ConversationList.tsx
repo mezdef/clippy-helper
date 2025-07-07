@@ -47,6 +47,7 @@ const ConversationListComponent = forwardRef<
       [deleteConversationMutation, onDeleteConversation]
     );
 
+    // Navigate to the conversation page when clicked and close the sidebar
     const handleConversationClick = useCallback(
       (conversationId: string) => {
         router.push(`/conversations/${conversationId}`);
