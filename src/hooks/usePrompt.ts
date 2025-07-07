@@ -10,12 +10,7 @@ import type {
   AiRequestInput,
   AiResponseStructured,
 } from '@/services/llm.service';
-import {
-  API_ENDPOINTS,
-  ERROR_MESSAGES,
-  QUERY_KEYS,
-  MESSAGE_ROLES,
-} from '@/constants';
+import { API_ENDPOINTS, ERROR_MESSAGES, QUERY_KEYS } from '@/constants';
 import { post } from '@/utils/api';
 
 interface UsePromptProps {

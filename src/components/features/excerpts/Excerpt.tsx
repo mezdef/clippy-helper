@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Edit2, Trash2, X } from 'lucide-react';
 import { EditExcerptForm } from './EditExcerptForm';

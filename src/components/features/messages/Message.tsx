@@ -1,5 +1,5 @@
 'use client';
-import React, { JSX, useState } from 'react';
+import React, { JSX } from 'react';
 import { Edit2, X } from 'lucide-react';
 import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar, Button } from '@/components/ui';

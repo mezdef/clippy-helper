@@ -1,5 +1,4 @@
 import React from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
 import { Excerpt } from './Excerpt';
 import type { Excerpt as ExcerptType } from './Excerpt';
 import type { EditingItem } from '@/types';
@@ -16,7 +15,7 @@ interface ExcerptsListProps {
 export const ExcerptsList: React.FC<ExcerptsListProps> = React.memo(
   ({
     excerpts,
-    borderColor = 'border-blue-500',
+    borderColor: _borderColor = 'border-blue-500',
     onEditExcerpt,
     onDeleteExcerpt,
     editingItem,
