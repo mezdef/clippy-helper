@@ -6,11 +6,11 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { MessagesSquare, X, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/hooks/useSidebar';
-import { useCreateConversation } from '@/hooks/useConversations';
+import { MessagesSquare, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { useCreateConversation } from '@/hooks/useConversations';
+import { useSidebar } from '@/hooks/useSidebar';
 
 interface SidebarMenuProps {
   children: ReactNode;
@@ -44,6 +44,7 @@ export const SidebarMenu = forwardRef<SidebarMenuRef, SidebarMenuProps>(
       useSidebar(sidebarId);
     const createConversationMutation = useCreateConversation();
 
+    // Create a new conversation and navigate to it
     const handleNewConversation = useCallback(async () => {
       try {
         const newConversation = await createConversationMutation.mutateAsync(

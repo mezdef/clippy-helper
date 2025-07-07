@@ -3,9 +3,9 @@ import {
   useQueryClient,
   UseMutationResult,
 } from '@tanstack/react-query';
-import { useAppState } from './useAppState';
-import type { FormattedMessage } from '@/services/message.service';
 import type { Excerpt } from '@/db/schema';
+import type { FormattedMessage } from '@/services/message.service';
+import { useAppState } from './useAppState';
 
 // Update an excerpt
 export const useUpdateExcerpt = (): UseMutationResult<

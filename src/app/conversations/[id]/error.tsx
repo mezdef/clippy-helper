@@ -1,5 +1,5 @@
 'use client';
-import { Error } from '@/components/ui/Error';
+import { Error } from '@/components/ui';
 
 interface ErrorProps {
   error: Error & { digest?: string };

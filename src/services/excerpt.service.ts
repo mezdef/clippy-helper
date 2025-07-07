@@ -1,6 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { excerpts, type NewExcerpt } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import type { AdviceList } from '@/types';
 
 export const excerptService = {

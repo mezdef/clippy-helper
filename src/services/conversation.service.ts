@@ -1,3 +1,4 @@
+import { eq, desc } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   conversations,
@@ -6,7 +7,6 @@ import {
   type NewConversation,
   type MessageWithExcerpts,
 } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
 
 interface ConversationWithMessages extends NewConversation {
   messages: MessageWithExcerpts[];

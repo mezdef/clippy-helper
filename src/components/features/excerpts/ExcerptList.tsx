@@ -1,8 +1,8 @@
 import React from 'react';
 import { useUpdateExcerpt, useDeleteExcerpt } from '@/hooks/useExcerpts';
+import type { EditingItem } from '@/types';
 import { Excerpt } from './Excerpt';
 import type { Excerpt as ExcerptType } from './Excerpt';
-import type { EditingItem } from '@/types';
 
 interface ExcerptsListProps {
   excerpts: ExcerptType[];

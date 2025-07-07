@@ -1,8 +1,8 @@
 'use client';
 import React, { JSX } from 'react';
 import { LucideIcon } from 'lucide-react';
-import { cn } from '@/utils/cn';
 import type { ButtonVariant, ComponentSize } from '@/types';
+import { cn } from '@/utils/cn';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;

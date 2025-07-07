@@ -1,13 +1,13 @@
 'use client';
-import React, { JSX, forwardRef, useCallback } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import type { SidebarMenuRef } from '@/components/layout';
 import { LoadingSpinner } from '@/components/ui/loading';
 import {
   useConversations,
   useDeleteConversation,
 } from '@/hooks/useConversations';
 import { ConversationItem } from './ConversationItem';
-import type { SidebarMenuRef } from '@/components/layout';
 
 interface ConversationListProps {
   onConversationClick?: (conversationId: string) => void;
@@ -23,7 +23,7 @@ const ConversationListComponent = forwardRef<
   (
     { onConversationClick, onDeleteConversation, className = '', sidebarRef },
     ref
-  ): JSX.Element => {
+  ): React.ReactElement => {
     const router = useRouter();
     const pathname = usePathname();
 

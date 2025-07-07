@@ -1,4 +1,4 @@
-import { Error } from '@/components/ui/Error';
+import { Error } from '@/components/ui';
 
 export default function NotFound(): React.ReactElement {
   return (

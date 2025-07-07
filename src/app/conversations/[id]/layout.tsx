@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { LoadingPage } from '@/components/ui/loading';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { LoadingPage } from '@/components/ui/loading';
 
 export default function ConversationLayout({
   children,

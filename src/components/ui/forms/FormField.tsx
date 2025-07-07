@@ -1,3 +1,4 @@
+'use client';
 import React, { JSX, useRef, useEffect } from 'react';
 
 interface FormFieldProps {
@@ -26,6 +27,7 @@ export const FormField: React.FC<FormFieldProps> = ({
     }
   }, [children]);
 
+  // Clicking a Label should focus the input
   const handleLabelClick = () => {
     if (inputRef.current) {
       inputRef.current.focus();

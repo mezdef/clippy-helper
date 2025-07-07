@@ -1,9 +1,9 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import { OPENAI_CONFIG, ERROR_MESSAGES } from '@/constants';
 import { env } from '@/lib/env';
 import type { FormattedMessage } from './message.service';
-import { OPENAI_CONFIG, ERROR_MESSAGES } from '@/constants';
 
 // Schema for structured AI advice - ensures consistent output format
 const ListItem = z.object({

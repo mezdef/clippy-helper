@@ -1,10 +1,10 @@
 'use client';
 import React, { JSX } from 'react';
 import { Edit2, X } from 'lucide-react';
-import { ExcerptsList } from '../excerpts/ExcerptList';
 import { Avatar, Button } from '@/components/ui';
-import { EditMessageForm } from './EditMessageForm';
 import type { MessageRole, EditingStateProps } from '@/types';
+import { ExcerptsList } from '../excerpts/ExcerptList';
+import { EditMessageForm } from './EditMessageForm';
 
 interface MessageProps extends EditingStateProps {
   role: MessageRole;

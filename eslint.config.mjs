@@ -13,7 +13,7 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   ...compat.extends('prettier'), // Disable ESLint rules that conflict with Prettier
   ...compat.config({
-    plugins: ['prettier', '@typescript-eslint'],
+    plugins: ['prettier', '@typescript-eslint', 'import'],
     rules: {
       // Prettier integration
       'prettier/prettier': 'error',
@@ -45,6 +45,62 @@ const eslintConfig = [
 
       // Import/export rules
       'no-unused-private-class-members': 'error',
+
+      // Import organization
+      'import/order': [
+        'warn',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          'newlines-between': 'never',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+          pathGroups: [
+            {
+              pattern: 'react',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: 'next/**',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: '@/**',
+              group: 'internal',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['react'],
+        },
+      ],
+
+      // Encourage using index imports for component directories
+      'import/no-internal-modules': [
+        'warn',
+        {
+          forbid: [
+            // Encourage using index imports for these component directories
+            '@/components/ui/Button',
+            '@/components/ui/Avatar',
+            '@/components/ui/Error',
+            '@/components/ui/loading/LoadingPage',
+            '@/components/ui/loading/LoadingSpinner',
+            '@/components/ui/forms/Form',
+            '@/components/ui/forms/Input',
+            '@/components/ui/forms/Textarea',
+            '@/components/ui/forms/FormField',
+          ],
+        },
+      ],
     },
   }),
 ];

@@ -1,8 +1,8 @@
 'use client';
 import React, { JSX, forwardRef, useImperativeHandle } from 'react';
-import { Form, Input } from '@/components/ui/forms';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { Form, Input } from '@/components/ui/forms';
 import { usePrompt } from '@/hooks/usePrompt';
 
 interface PromptFormProps {

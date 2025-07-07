@@ -1,11 +1,11 @@
 'use client';
 import React, { JSX, useRef, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
-import { Message } from './Message';
 import { TypingIndicator } from '@/components/ui/TypingIndicator';
-import { MessageListTitle } from './MessageListTitle';
-import { generateMapKey } from '@/utils/generateMapKey';
 import type { EditingItem, MessageRole } from '@/types';
+import { generateMapKey } from '@/utils/generateMapKey';
+import { Message } from './Message';
+import { MessageListTitle } from './MessageListTitle';
 
 interface MessageType {
   role: MessageRole;
@@ -88,6 +88,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               setEditingItem={setEditingItem}
             />
           ))}
+          {/* Typing indicator for while the LLM is thinking */}
           {isTyping && <TypingIndicator />}
         </div>
       )}

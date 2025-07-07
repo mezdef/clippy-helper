@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { messageService } from '@/services';
 import { HTTP_STATUS, ERROR_MESSAGES } from '@/constants';
+import { messageService } from '@/services';
 
 // GET /api/conversations/[id]/messages - Retrieves all messages for a conversation
 export async function GET(

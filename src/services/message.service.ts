@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   messages,
@@ -7,7 +8,6 @@ import {
   type Excerpt,
   type MessageWithExcerpts,
 } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import type { AdviceList, ExcerptData, MessageRole } from '@/types';
 
 // UI-friendly message format that flattens the database structure
